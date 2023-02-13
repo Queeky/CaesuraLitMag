@@ -1,0 +1,147 @@
+/* General Style */
+
+body, header, .pageName, .pageBody, .pageMessage, #submissionGuidelines {
+    margin: 0px; 
+}
+
+body {
+    margin: 0px; 
+    background-color: #fcf2f5; 
+    /* border: 1px solid red;  */
+}
+
+/* set general characteristics, like inline-block and 0 margins */
+
+header, footer {
+    display: block; 
+    height: 20px; /* this isn't the best solution; fix later */
+    padding-top: 7px;
+    padding-bottom: 7px; 
+    background-color: white; 
+}
+
+header {
+    position: sticky; 
+    top: 0; 
+}
+
+header a {
+    display: inline-block; 
+    padding-left: 2px; 
+    padding-right: 2px; 
+    margin-left: 2px; 
+    margin-right: 2px; 
+    text-decoration: none; 
+    font-family: "Bahnschrift Light", "Calibri", Arial, Helvetica, sans-serif;
+    font-size: 16px;  
+}
+
+#linkButtons {
+    margin: 0px; 
+    margin-right: 10px; 
+    float: right; 
+}
+
+.pageName {
+    margin: 0px;
+    display: flex; 
+    flex-wrap: wrap; 
+    height: 600px; 
+    align-items: center; 
+    background-color: grey;
+    background-image: url("../images/headerBackground_1.jpg");
+    background-repeat: no-repeat;
+    background-size: cover;
+    /* box-shadow: inset 0 0 0 1000px rgba(255, 255, 255, 0.3); */
+    box-shadow: inset 0 0 0 1000px rgba(0, 0, 0, 0.6);
+    /* border: 1px solid blue;  */
+}
+
+.pageName h1 {
+    font-size: 82px; 
+    font-family: "Garamond", "Times New Roman", serif; 
+    color: white; 
+}
+
+.pageBody {
+    margin: 0px; 
+    text-align: center; 
+    /* display: flex;  */
+    /* flex-wrap: wrap;  */
+    /* align-items: center;  */
+    /* background-color: white; 
+    border-left: 200px solid grey; 
+    border-right: 200px solid grey;  */
+}
+
+.pageMessage {
+    margin: 0px; 
+    flex: 100%; 
+    text-align: center; 
+}
+
+/* Index Page  */
+
+#issueDisplayed {
+    margin-top: 25px; 
+    margin-bottom: 10px; 
+    width: 70%; 
+    display: inline-block; 
+    background-color: white; 
+}
+
+#issueDisplayed h3, #currentNotifs h3 {
+    font-family: "Bahnschrift Light", "Calibri", Arial, Helvetica, sans-serif; 
+    font-weight: bold; 
+    font-size: 34px; 
+    color: #383838; 
+    text-align: center; 
+}
+
+#issueDisplayed p {
+    font-family: "Bahnschrift Light", "Calibri", Arial, Helvetica, sans-serif;
+    font-size: 18px; 
+    color: #383838; 
+}
+
+#issueDisplayed img {
+    width: 100%; 
+}
+
+#currentNotifs {
+    display: block; 
+    background-color: white; 
+}
+
+/* Submission Page */
+
+#submissionGuidelines {
+    display: inline-block; 
+    margin: 0px; 
+    padding-bottom: 20px; 
+    background-color: white; 
+}
+
+#submissionGuidelines h3 {
+    padding-top: 20px; 
+    padding-bottom: 10px; 
+    font-family: "Bahnschrift Light", "Calibri", Arial, Helvetica, sans-serif; 
+    font-weight: bold; 
+    font-size: 34px; 
+    color: #383838; 
+    text-align: center; 
+    border-bottom: 1px solid black; 
+}
+
+#submissionGuidelines ul {
+    margin-left: 100px; 
+    margin-right: 100px; 
+}
+
+#submissionGuidelines li {
+    margin-bottom: 15px; 
+    font-family: "Bahnschrift Light", "Calibri", Arial, Helvetica, sans-serif;
+    font-size: 18px; 
+    color: #383838; 
+    text-align: left; 
+}
