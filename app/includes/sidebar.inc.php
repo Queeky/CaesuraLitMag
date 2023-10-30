@@ -2,10 +2,12 @@
     function displaySidebar() {
         echo "<div class='sidebar'>"; 
 
-        echo "<form action='archives.php' method='GET'>"; 
-        echo "<label for='query'>SEARCH WORKS</label>"; 
-        echo "<input type='text' name='query' value='e.g. Jane Smith poetry 2020'>"; 
-        echo "<input type='submit' value='Search'>"; 
+        echo "<form action='archives.php' method='GET' target='_blank'>"; 
+        echo "<label for='query'>SEARCH WORKS</label>";
+        echo "<div>";  
+        echo "<input type='text' name='query' placeholder='e.g. Jane Smith poetry 2020'>"; 
+        echo "<button type='submit'><img src='images/SearchIcon.png'></button>"; 
+        echo "</div>"; 
         echo "</form>"; 
 
         echo "<div class='contact'>"; 
@@ -21,6 +23,7 @@
         echo "<li>2023 | Name</li>"; 
         echo "<li>2023 | Name</li>"; 
         echo "<li>2023 | Name</li>"; 
+        echo "<li>2023 | Name</li>";
         echo "</ul>"; 
         echo "</div>"; 
 

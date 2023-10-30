@@ -1,5 +1,24 @@
 <?php 
 
+$results = $database->selectCustom("MEDIA_TYPE", ["*"]); 
+
+function displayAdmin() {
+    if (isset($_SESSION["admName"])) {
+        echo "<div class='admin-bar'>"; 
+
+        echo "<p>Welcome back, $_SESSION[admName]</p>"; 
+        echo "<div class='buttons'>"; 
+        echo "<div>"; 
+        echo "<button><a href='#'>Add/Remove Media</a></button>"; 
+        echo "<button><a href='#'>Add/Remove Issues</a></button>"; 
+        echo "<button><a href='#'>Add/Remove Works</a></button>"; 
+        echo "</div>"; 
+        echo "</div>"; 
+
+        echo "</div>"; 
+    }
+}
+
 function displayHeader($title) {
     echo "<header>"; 
     echo "<h1>$title</h1>"; 
@@ -7,7 +26,7 @@ function displayHeader($title) {
     echo "</header>"; 
 }
 
-function displayNav() {
+function displayNav($results) {
     echo "<nav>"; 
 
     echo "<div class='mobile-nav'>"; 
@@ -24,11 +43,14 @@ function displayNav() {
     echo "<li class='archives-li'>"; 
     echo "<a href='archives.php' target='_blank'>ARCHIVES</a>"; 
     echo "<ul class='sub-nav archives'>"; 
-    echo "<li><a href='archives.php' target='_blank'>ALL TYPES</a></li>"; 
-    echo "<li><a href='archives.php' target='_blank'>POETRY</a></li>";
-    echo "<li><a href='archives.php' target='_blank'>FICTION</a></li>";
-    echo "<li><a href='archives.php' target='_blank'>NONFICTION</a></li>";
-    echo "<li><a href='archives.php' target='_blank'>ART</a></li>";
+
+    echo "<li><a href='archives.php' target='_blank'>ALL TYPES</a></li>";
+
+    // Dynamically adding media types to dropdown
+    foreach ($results as $media) {
+        echo "<li><a href='archives.php' target='_blank'>$media[MEDIA_NAME]</a></li>";
+    }
+
     echo "</ul>"; 
     echo "</li>"; 
 
@@ -66,6 +88,7 @@ function displayNav() {
     echo "</nav>"; 
 }
 
+displayAdmin(); 
 displayHeader($title); 
-displayNav(); 
+displayNav($results); 
 ?>

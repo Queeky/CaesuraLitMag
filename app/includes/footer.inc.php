@@ -11,7 +11,7 @@
         echo "<div class='footer-contact'>"; 
         echo "<a href='tel:7656772712'>(765) 677 2712</a>"; 
         echo "<a href='mailto:caesura@indwes.edu'>caesura@indwes.edu</a>"; 
-        echo "<button><a href='#'>Admin</a></button>"; 
+        echo "<button><a href='login.php' target='_blank'>Admin</a></button>"; 
         echo "</div>"; 
 
         echo "</footer>"; 
