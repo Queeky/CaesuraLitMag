@@ -9,9 +9,9 @@
             // Formatting data
             $mediaName = ucfirst(strtolower($mediaName));
 
-            $result = $database->insertValues("MEDIA_TYPE", ["MEDIA_NAME"], [$mediaName]); 
+            $added = $database->insertValues("MEDIA_TYPE", ["MEDIA_NAME"], [$mediaName]); 
 
-            if ($result) {
+            if ($added) {
                 echo "<p class='header-notif'>$mediaName successfully added.</p>";
             } else {
                 echo "<p class='header-notif'>Error pushing $mediaName to database.</p>"; 

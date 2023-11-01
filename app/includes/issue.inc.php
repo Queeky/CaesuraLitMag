@@ -24,8 +24,28 @@
             echo "<p>There is nothing here at the moment!</p>"; 
             echo "</div>"; 
         }
-
     }
 
-    displayIssue($results); 
+    function displayWorks($results, $database) {
+        echo "<div class='issue-works'>"; 
+        echo "<ul>"; 
+
+        $id = null; 
+        foreach ($results as $issue) {
+            $id = $issue["ISS_ID"]; 
+        }
+
+        $results = $database->selectCustom("WORK", ["WORK.WORK_NAME", "CONTRIBUTOR.CON_FNAME", "CONTRIBUTOR.CON_LNAME"], ["WORK.ISS_ID"], [$id], ["="], "AND", ["CONTRIBUTOR"], ["WORK.CON_ID"], ["CONTRIBUTOR.CON_ID"]);
+
+        foreach ($results as $work) {
+            echo "<li>"; 
+            echo "<p class='title'>$work[WORK_NAME]</p>"; 
+            echo "<p class='contributor'>$work[CON_FNAME] $work[CON_LNAME]</p>"; 
+            echo "</li>"; 
+        }
+
+        echo "</ul>"; 
+        echo "</div>"; 
+    }
+
 ?>

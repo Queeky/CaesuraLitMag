@@ -46,9 +46,9 @@
                 }
             }
 
-            $result = $database->insertValues("WORK", ["CON_ID", "ISS_ID", "THUMB_ID", "MEDIA_ID", "WORK_NAME", "WORK_CONTENT"], [$conId, $issId, $thumbId, $mediaId, $workName, $workContent]); 
+            $added = $database->insertValues("WORK", ["CON_ID", "ISS_ID", "THUMB_ID", "MEDIA_ID", "WORK_NAME", "WORK_CONTENT"], [$conId, $issId, $thumbId, $mediaId, $workName, $workContent]); 
 
-            if ($result) {
+            if ($added) {
                 echo "<p class='header-notif'>$workName successfully added.</p>";
             } else {
                 echo "<p class='header-notif'>Error pushing $workName to database.</p>"; 

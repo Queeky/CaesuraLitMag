@@ -29,9 +29,9 @@
                     $thumbId = $id["THUMB_ID"]; 
                 }
 
-                $newIssue = $database->insertValues("ISSUE", ["ISS_NAME", "ISS_DATE", "THUMB_ID", "ISS_DESCRIPT"], [$issName, $issDate, $thumbId, $issDescript]); 
+                $added = $database->insertValues("ISSUE", ["ISS_NAME", "ISS_DATE", "THUMB_ID", "ISS_DESCRIPT"], [$issName, $issDate, $thumbId, $issDescript]); 
 
-                if ($newIssue) {
+                if ($added) {
                     echo "<p class='header-notif'>$issName successfully added.</p>";
                 } else {
                     echo "<p class='header-notif'>Error pushing $issName to database.</p>"; 

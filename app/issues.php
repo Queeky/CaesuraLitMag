@@ -22,6 +22,8 @@
                 <?php 
                     $results = $database->selectAllIssues(); 
                     include("includes/issue.inc.php"); 
+
+                    displayIssue($results); 
                 ?>
             </div>
             <?php 

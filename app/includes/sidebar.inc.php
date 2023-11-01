@@ -1,5 +1,5 @@
 <?php
-    function displaySidebar() {
+    function displaySidebar($database) {
         echo "<div class='sidebar'>"; 
 
         echo "<form action='archives.php' method='GET' target='_blank'>"; 
@@ -20,15 +20,19 @@
         echo "<div class='issues'>"; 
         echo "<label for='#'>PAST ISSUES</label>"; 
         echo "<ul>"; 
-        echo "<li>2023 | Name</li>"; 
-        echo "<li>2023 | Name</li>"; 
-        echo "<li>2023 | Name</li>"; 
-        echo "<li>2023 | Name</li>";
+
+        $pastIssues = $database->selectCustom("ISSUE", ["YEAR(ISS_DATE) AS ISS_DATE", "ISS_ID", "LEFT(ISS_NAME, 15) AS ISS_NAME"], [], [], [], "AND", [], [], [], "ISS_DATE DESC"); 
+
+        foreach ($pastIssues as $issue) {
+            $issue["ISS_NAME"] = strtoupper($issue["ISS_NAME"]); 
+            echo "<a href='#'><li>$issue[ISS_DATE] | $issue[ISS_NAME]</li></a>"; 
+        }
+
         echo "</ul>"; 
         echo "</div>"; 
 
         echo "</div>"; 
     }
 
-    displaySidebar(); 
+    displaySidebar($database); 
 ?>

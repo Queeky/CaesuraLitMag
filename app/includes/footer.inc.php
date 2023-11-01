@@ -3,9 +3,9 @@
         echo "<footer>"; 
 
         echo "<div class='footer-socials'>"; 
-        echo "<a href='https://www.instagram.com/caesuramagazine/?hl=en'><img id='blog' src='images/CaesuraIcon2.png' alt='MLL blog icon'></a>";
-        echo "<a href='#'><img id='facebook' src='images/FacebookIcon.png' alt='Facebook icon'></a>"; 
-        echo "<a href='#'><img id='instagram' src='images/InstagramIcon.png' alt='Instagram icon'></a>";
+        echo "<a href='https://iwumllsylva.wixsite.com/sylva'><img id='blog' src='images/CaesuraIcon2.png' alt='MLL blog icon'></a>";
+        echo "<a href='https://www.facebook.com/caesura.iwu/'><img id='facebook' src='images/FacebookIcon.png' alt='Facebook icon'></a>"; 
+        echo "<a href='https://www.instagram.com/caesuramagazine/?hl=en'><img id='instagram' src='images/InstagramIcon.png' alt='Instagram icon'></a>";
         echo "</div>"; 
 
         echo "<div class='footer-contact'>"; 

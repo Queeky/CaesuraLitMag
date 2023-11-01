@@ -21,10 +21,13 @@
                 <?php 
                     $results = $database->selectRecentIssue(); 
                     include("includes/issue.inc.php"); 
+
+                    displayIssue($results); 
+                    displayWorks($results, $database); 
                 ?>
-                <div class='issue-works'>
-                    <ul>
-                        <li>
+        
+
+                        <!-- <li>
                             <p class='title'>TWILIGHT STADIUM</p>
                             <p class='contributor'>Quinn Miersma</p>
                         </li>
@@ -35,37 +38,7 @@
                         <li>
                             <p class='title'>TWILIGHT STADIUM</p>
                             <p class='contributor'>Quinn Miersma</p>
-                        </li>
-                        <li>
-                            <p class='title'>TWILIGHT STADIUM</p>
-                            <p class='contributor'>Quinn Miersma</p>
-                        </li>
-                        <li>
-                            <p class='title'>TWILIGHT STADIUM</p>
-                            <p class='contributor'>Quinn Miersma</p>
-                        </li>
-                        <li>
-                            <p class='title'>TWILIGHT STADIUM</p>
-                            <p class='contributor'>Quinn Miersma</p>
-                        </li>
-                        <li>
-                            <p class='title'>TWILIGHT STADIUM</p>
-                            <p class='contributor'>Quinn Miersma</p>
-                        </li>
-                        <li>
-                            <p class='title'>TWILIGHT STADIUM</p>
-                            <p class='contributor'>Quinn Miersma</p>
-                        </li>
-                        <li>
-                            <p class='title'>TWILIGHT STADIUM</p>
-                            <p class='contributor'>Quinn Miersma</p>
-                        </li>
-                        <li>
-                            <p class='title'>TWILIGHT STADIUM</p>
-                            <p class='contributor'>Quinn Miersma</p>
-                        </li>
-                    </ul>
-                </div>
+                        </li> -->
             </div>
             <?php 
                 include("includes/sidebar.inc.php"); 

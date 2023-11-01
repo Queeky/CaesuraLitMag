@@ -14,9 +14,9 @@ function displayAdmin() {
         echo "<button><a href='workAdd.php'>Add Works</a></button>"; 
         echo "</div>"; 
         echo "<div>"; 
-        echo "<button><a href='#'>Remove Media</a></button>"; 
-        echo "<button><a href='#'>Remove Issues</a></button>"; 
-        echo "<button><a href='#'>Remove Works</a></button>"; 
+        echo "<button><a href='mediaRemove.php'>Remove Media</a></button>"; 
+        echo "<button><a href='issueRemove.php'>Remove Issues</a></button>"; 
+        echo "<button><a href='workRemove.php'>Remove Works</a></button>"; 
         echo "</div>"; 
         echo "</div>"; 
 

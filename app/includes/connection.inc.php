@@ -68,6 +68,18 @@ class Database {
         }
     }
 
+    function deleteValues($table, $wCond, $wValue) {
+        // Only takes one wCond and wValue value because it is searching for the id
+        $sql = "DELETE FROM $table "; 
+        $sql .= "WHERE $wCond = $wValue;"; 
+
+        if (mysqli_query($this->conn, $sql) === true) {
+            return true; 
+        } else {
+            return false; 
+        }
+    }
+
     // Checks if contributor already exists
     // If true, returns id; if false, creates new contributor
     function checkContributor($fName, $lName) {
@@ -103,7 +115,7 @@ class Database {
         }
     }
 
-    function selectCustom($table, $selected, $wColumn = [], $wValue = [], $wOperator = [], $wCond = "AND", $jTable = [], $jColumn1 = [], $jColumn2 = []) {
+    function selectCustom($table, $selected, $wColumn = [], $wValue = [], $wOperator = [], $wCond = "AND", $jTable = [], $jColumn1 = [], $jColumn2 = [], $order = null) {
         // Sanitizing input
         $wValue = $this->sanitize($wValue); 
 
@@ -154,6 +166,10 @@ class Database {
                     $sql = $sql . "$wColumn[$i] LIKE '%$wValue[$i]%' "; 
                     break; 
             } 
+        }
+
+        if ($order) {
+            $sql .= "ORDER BY $order "; 
         }
 
         $sql .= ";"; 
@@ -267,6 +283,7 @@ class Database {
     }
 
     // Getting the most recent issue by searching max ISS_ID
+    // OR order by desc but only receiving one; then I can use selectCustom
     function selectRecentIssue() {
         $sql = "SELECT ISSUE.ISS_ID, ISSUE.ISS_NAME, YEAR(ISSUE.ISS_DATE) AS ISS_DATE, THUMBNAIL.THUMB_LINK, "; 
         $sql .= "LEFT(ISSUE.ISS_DESCRIPT, 150) AS ISS_DESCRIPT, "; 
