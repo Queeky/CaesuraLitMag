@@ -1,3 +1,7 @@
+<?php 
+    session_start(); 
+    include("includes/connection.inc.php"); 
+?>
 <!DOCTYPE html>
 <html>
     <head>
@@ -13,62 +17,55 @@
         ?>
         <div class='page-wrap'>
             <div class='content-wrap float-left'>
-                <div class='issue'>
-                    <div class='issue-label'>
-                        <h1>TITLE HERE</h1>
-                        <h3>Issue 2023</h3>
-                    </div>
-                    <div class='issue-image'>
-                        <img src="images/BikeWagon.jpg" alt="Bike with a little cart attached to the back.">
-                    </div>
-                    <div class='issue-descript'>
-                        <p>Here is where the issue description would be if there was any issue description...</p>
-                    </div>
+
+                <?php 
+                    $results = $database->selectRecentIssue(); 
+                    include("includes/issue.inc.php"); 
+                ?>
+                <div class='issue-works'>
+                    <ul>
+                        <li>
+                            <p class='title'>TWILIGHT STADIUM</p>
+                            <p class='contributor'>Quinn Miersma</p>
+                        </li>
+                        <li>
+                            <p class='title'>TWILIGHT STADIUM</p>
+                            <p class='contributor'>Quinn Miersma</p>
+                        </li>
+                        <li>
+                            <p class='title'>TWILIGHT STADIUM</p>
+                            <p class='contributor'>Quinn Miersma</p>
+                        </li>
+                        <li>
+                            <p class='title'>TWILIGHT STADIUM</p>
+                            <p class='contributor'>Quinn Miersma</p>
+                        </li>
+                        <li>
+                            <p class='title'>TWILIGHT STADIUM</p>
+                            <p class='contributor'>Quinn Miersma</p>
+                        </li>
+                        <li>
+                            <p class='title'>TWILIGHT STADIUM</p>
+                            <p class='contributor'>Quinn Miersma</p>
+                        </li>
+                        <li>
+                            <p class='title'>TWILIGHT STADIUM</p>
+                            <p class='contributor'>Quinn Miersma</p>
+                        </li>
+                        <li>
+                            <p class='title'>TWILIGHT STADIUM</p>
+                            <p class='contributor'>Quinn Miersma</p>
+                        </li>
+                        <li>
+                            <p class='title'>TWILIGHT STADIUM</p>
+                            <p class='contributor'>Quinn Miersma</p>
+                        </li>
+                        <li>
+                            <p class='title'>TWILIGHT STADIUM</p>
+                            <p class='contributor'>Quinn Miersma</p>
+                        </li>
+                    </ul>
                 </div>
-            </div>
-            <div class='issue-works'>
-                <ul>
-                    <li>
-                        <p class='title'>TWILIGHT STADIUM</p>
-                        <p class='contributor'>Quinn Miersma</p>
-                    </li>
-                    <li>
-                        <p class='title'>TWILIGHT STADIUM</p>
-                        <p class='contributor'>Quinn Miersma</p>
-                    </li>
-                    <li>
-                        <p class='title'>TWILIGHT STADIUM</p>
-                        <p class='contributor'>Quinn Miersma</p>
-                    </li>
-                    <li>
-                        <p class='title'>TWILIGHT STADIUM</p>
-                        <p class='contributor'>Quinn Miersma</p>
-                    </li>
-                    <li>
-                        <p class='title'>TWILIGHT STADIUM</p>
-                        <p class='contributor'>Quinn Miersma</p>
-                    </li>
-                    <li>
-                        <p class='title'>TWILIGHT STADIUM</p>
-                        <p class='contributor'>Quinn Miersma</p>
-                    </li>
-                    <li>
-                        <p class='title'>TWILIGHT STADIUM</p>
-                        <p class='contributor'>Quinn Miersma</p>
-                    </li>
-                    <li>
-                        <p class='title'>TWILIGHT STADIUM</p>
-                        <p class='contributor'>Quinn Miersma</p>
-                    </li>
-                    <li>
-                        <p class='title'>TWILIGHT STADIUM</p>
-                        <p class='contributor'>Quinn Miersma</p>
-                    </li>
-                    <li>
-                        <p class='title'>TWILIGHT STADIUM</p>
-                        <p class='contributor'>Quinn Miersma</p>
-                    </li>
-                </ul>
             </div>
             <?php 
                 include("includes/sidebar.inc.php"); 

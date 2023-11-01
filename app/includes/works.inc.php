@@ -1,6 +1,4 @@
 <?php 
-    $query = htmlspecialchars($query); 
-    $query = mysqli_real_escape_string($database->conn, $query); // Screening special chars
     $queryArray = explode(" ", $query); // Breaking up keywords w/ " " delimiter
     
     $idCount; 

@@ -9,9 +9,14 @@ function displayAdmin() {
         echo "<p>Welcome back, $_SESSION[admName]</p>"; 
         echo "<div class='buttons'>"; 
         echo "<div>"; 
-        echo "<button><a href='#'>Add/Remove Media</a></button>"; 
-        echo "<button><a href='#'>Add/Remove Issues</a></button>"; 
-        echo "<button><a href='#'>Add/Remove Works</a></button>"; 
+        echo "<button><a href='mediaAdd.php'>Add Media</a></button>"; 
+        echo "<button><a href='issueAdd.php'>Add Issues</a></button>"; 
+        echo "<button><a href='workAdd.php'>Add Works</a></button>"; 
+        echo "</div>"; 
+        echo "<div>"; 
+        echo "<button><a href='#'>Remove Media</a></button>"; 
+        echo "<button><a href='#'>Remove Issues</a></button>"; 
+        echo "<button><a href='#'>Remove Works</a></button>"; 
         echo "</div>"; 
         echo "</div>"; 
 

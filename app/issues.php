@@ -1,3 +1,8 @@
+<?php 
+    session_start(); 
+
+    include("includes/connection.inc.php"); 
+?>
 <!DOCTYPE html>
 <html>
     <head>
@@ -13,43 +18,11 @@
         ?>
 
         <div class='page-wrap'>
-            <div class='content-wrap float-left'>
-                <div class='issue'>
-                    <div class='issue-label'>
-                        <h1>TITLE HERE</h1>
-                        <h3>2023</h3>
-                    </div>
-                    <div class='issue-image'>
-                        <img src="images/BikeWagon.jpg" alt="Bike with a little cart attached to the back.">
-                    </div>
-                    <div class='issue-descript'>
-                        <p>Here is where the issue description would be if there was any issue description...</p>
-                    </div>
-                </div>
-                <div class='issue'>
-                    <div class='issue-label'>
-                        <h1>TITLE HERE</h1>
-                        <h3>2023</h3>
-                    </div>
-                    <div class='issue-image'>
-                        <img src="images/BikeWagon.jpg" alt="Bike with a little cart attached to the back.">
-                    </div>
-                    <div class='issue-descript'>
-                        <p>Here is where the issue description would be if there was any issue description...</p>
-                    </div>
-                </div>
-                <div class='issue'>
-                    <div class='issue-label'>
-                        <h1>TITLE HERE</h1>
-                        <h3>2023</h3>
-                    </div>
-                    <div class='issue-image'>
-                        <img src="images/BikeWagon.jpg" alt="Bike with a little cart attached to the back.">
-                    </div>
-                    <div class='issue-descript'>
-                        <p>Here is where the issue description would be if there was any issue description...</p>
-                    </div>
-                </div>
+            <div class='content-wrap float-left issue-page'>
+                <?php 
+                    $results = $database->selectAllIssues(); 
+                    include("includes/issue.inc.php"); 
+                ?>
             </div>
             <?php 
                 include("includes/sidebar.inc.php"); 

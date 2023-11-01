@@ -1,3 +1,13 @@
+<?php 
+    session_start(); 
+    include("includes/connection.inc.php"); 
+
+    $query = null; 
+
+    if (isset($_GET['query'])) {
+        $query = $_GET['query']; 
+    } 
+?>
 <!DOCTYPE html>
 <html>
     <head>
@@ -14,27 +24,9 @@
 
         <div class='page-wrap'>
             <div class='content-wrap'>
-                <div class='archive-item'>
-                    <img style='width:20vw;' src="images/BikeWagon.jpg" alt="">
-                    <div>
-                        <p>Fake Work Here</p>
-                        <p>Quinn Miersma</p>
-                    </div>
-                </div>
-                <div class='archive-item'>
-                    <img style='width:20vw;' src="images/BikeWagon.jpg" alt="">
-                    <div>
-                        <p>Fake Work Here</p>
-                        <p>Quinn Miersma</p>
-                    </div>
-                </div>
-                <div class='archive-item'>
-                    <img style='width:20vw;' src="images/BikeWagon.jpg" alt="">
-                    <div>
-                        <p>Fake Work Here</p>
-                        <p>Quinn Miersma</p>
-                    </div>
-                </div>
+                <?php 
+                    include("includes/works.inc.php"); 
+                ?>
             </div>
         </div>
         <?php

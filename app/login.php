@@ -3,9 +3,11 @@
 
     include("includes/connection.inc.php"); 
 
-    if (isset($_POST["login-submit"])) {
+    if (isset($_POST["loginSubmit"])) {
         $name = $_POST["admName"];
         $pass = $_POST["admPass"]; 
+
+        // SCAN FOR SQL INJECTION
 
         if (!empty($name) && !empty($pass)) {
             $result = $database->selectCustom("ADMIN", ["ADM_ID"], ["ADM_NAME", "ADM_PASS"], ["$_POST[admName]", "$_POST[admPass]"], ["=", "="], "AND"); 
@@ -14,14 +16,14 @@
                 $_SESSION["admName"] = $name; 
                 echo "<meta http-equiv='refresh' content='0; URL=index.php'>"; 
             } else {
-                echo "<p>Password or username is incorrect.</p>"; 
+                echo "<p class='header-notif'>Password or username is incorrect.</p>"; 
             }
         } else {
-            echo "<p>Both fields need input.</p>"; 
+            echo "<p class='header-notif'>A field is missing information.</p>"; 
         }
     }
 
-    if (isset($_POST["logout-submit"])) {
+    if (isset($_POST["logoutSubmit"])) {
         session_unset(); 
         echo "<meta http-equiv='refresh' content='0; URL=index.php'>";
     }
@@ -42,7 +44,7 @@
         ?>
         <div class='page-wrap'>
             <div class='content-wrap'>
-                <div class='login-form'>
+                <div class='form'>
                     <?php 
                         echo "<form action='login.php' method='POST'>";
 
@@ -51,9 +53,9 @@
                             echo "<input type='text' name='admName' placeholder='Enter username'>"; 
                             echo "<label for='admPass'>PASSWORD: </label>"; 
                             echo "<input type='password' name='admPass' placeholder='Enter password'>";
-                            echo "<button type='submit' name='login-submit'>LOG IN</button>";  
+                            echo "<button type='submit' name='loginSubmit'>Log In</button>";  
                         } else {
-                            echo "<button type='submit' name='logout-submit'>LOG OUT</button>"; 
+                            echo "<button type='submit' name='logoutSubmit'>Log Out</button>"; 
                         }
 
                         echo "</form>"; 

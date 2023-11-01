@@ -23,12 +23,26 @@ body {
 }
 
 .page-wrap {
-    /* border: 1px solid red;  */
+    display: flex; 
+    justify-content: center;
     padding-top: 3vw; 
     padding-bottom: 3vw; 
+}
+
+.content-wrap.float-left {
+    display: inline-block; 
+    width: 60vw; 
+    margin-right: 5vw; 
+}
+
+.header-notif {
+    background-color: var(--iss5Primary); 
+    color: white; 
+    font-family:'Times New Roman', Times, serif; 
+    font-size: 1.2vw; 
     padding-left: 3vw; 
-    padding-right: 3vw; 
-    height: 100vh; 
+    padding-top: 1vw; 
+    padding-bottom: 1vw; 
 }
 
 /* Header  */
@@ -182,6 +196,7 @@ nav {
     text-decoration: none; 
     font-family: 'Tahoma', 'Verdana', monospace, sans-serif; 
     font-size: 95%;
+    text-transform: uppercase; 
 }
 
 .sub-nav.archives {
@@ -211,8 +226,9 @@ nav {
 
 /* Sidebar */
 
-.content-wrap.float-left {
-    float: left; 
+.sidebar > form > div > button, .sidebar > form > div > input, .sidebar > .issues > ul, .sidebar > .issues > ul > li {
+    margin: 0; 
+    padding: 0; 
 }
 
 .issue-contributors {
@@ -220,10 +236,102 @@ nav {
 }
 
 .sidebar {
-    float: right; 
+    margin-top: 0; 
+    display: inline-block; 
     width: 25vw; 
+    height: 100%;  
+    overflow-y: auto; 
+    align-self: right; 
+    /* Put overflow-y only at issues later */
 }
 
+.sidebar > form, .sidebar > div, .sidebar > form > label, .sidebar > div > label, .sidebar > div > a {
+    display: block; 
+}
+
+.sidebar > form, .sidebar > div {
+    margin-bottom: 2vw; 
+}
+
+.sidebar > form > div {
+    display: flex; 
+    align-items: center; 
+    height: 3vw; 
+}
+
+.sidebar label {
+    margin-bottom: 0.7vw; 
+    font-size: 1.5vw; 
+}
+
+.sidebar > form > div > input {
+    width: 20vw; 
+    height: 100%; 
+    border: 1px solid black; 
+    border-radius: 0; 
+}
+
+.sidebar > form > div > input:focus {
+    outline: none; 
+}
+
+.sidebar > form > div > input[placeholder] {
+    padding-left: 2vw; 
+    color: grey; 
+    font-size: 1.1vw; 
+    font-style: italic; 
+}
+
+.sidebar > form > div {
+    width: 100%; 
+}
+
+.sidebar > form > div > button {
+    background-color: black; 
+    height: 100%; 
+    width: 3vw; 
+    border: none; 
+}
+
+.sidebar > form > div > button:hover {
+    background-color: #7d7d7d; 
+}
+
+.sidebar > form > div > button > img {
+    width: 2vw; 
+}
+
+.sidebar > .contact > a {
+    text-decoration: none; 
+    color: black; 
+    margin-top: 0.5vw; 
+    font-size: 1.3vw; 
+}
+
+.sidebar > .contact > a:hover {
+    color: #020fc7; 
+}
+
+.sidebar > .issues > ul {
+    width: 100%; 
+    list-style-type: none;
+}
+
+.sidebar > .issues > ul > li {
+    width: 100%; 
+    margin-bottom: 0.1vw; 
+    padding-top: 1vw; 
+    padding-bottom: 1vw; 
+    background-color: black; 
+    color: white; 
+    text-align: center; 
+    font-size: 1.3vw; 
+    font-family: 'Tahoma', 'Verdana', monospace, sans-serif; 
+}
+
+.sidebar > .issues > ul > li:hover {
+    background-color: #7d7d7d; 
+}
 
 /* Footer  */
 
@@ -287,19 +395,21 @@ footer {
     width: 40vw; 
     height: 45vw; 
     background-color: var(--iss4Primary); 
+    float: left; 
     /* box-shadow: 2vw 4vh #545454;  */
 }
 
 .issue > .issue-label > h1 {
     margin: 0; 
-    margin-top: 1.5vw; 
+    padding-top: 1.5vw; 
     padding-bottom: 1.5vw; 
     font-weight: lighter; 
     color: white; 
     font-family: 'Garamond', 'Times New Roman', serif; 
     font-size: 2.5vw; 
     text-align: center; 
-    border-bottom: 1px solid var(--iss4Secondary);
+    background-color: var(--iss4Secondary);
+    text-transform: uppercase; 
 }
 
 .issue > .issue-label > h3 {
@@ -312,7 +422,7 @@ footer {
     font-family: 'Garamond', 'Times New Roman', serif; 
     text-align: center; 
     font-size: 1.5vw; 
-    background-color: var(--iss4Secondary);
+    /* background-color: var(--iss4Primary); */
 }
 
 .issue > .issue-descript > p {
@@ -325,14 +435,18 @@ footer {
 
 .issue img {
     width: 40vw; 
+    height: 25vw; 
+    object-fit: contain; 
+    background-color: black; 
 }
 
 .issue-works {
     display: inline-block; 
+    float: left; 
     /* margin-left: 2vw;  */
     padding-left: 2vw; 
     padding-right: 2vw; 
-    width: 18vw; 
+    width: 16vw; 
     height: 45vw;  
     overflow-y: scroll; 
     overflow-x: hidden; 
@@ -358,4 +472,256 @@ footer {
 .issue-works .contributor {
     margin-top: 0.5vw; 
     font-size: 1.2vw; 
+}
+
+/* About Page */
+
+.content-wrap.float-left > p {
+    margin: 0; 
+    padding: 0; 
+    display: inline-block; 
+    font-size: 1.5vw; 
+}
+
+#mll-lobby {
+    margin-top: 2vw; 
+}
+
+/* Archives Page */
+
+.grid > .archive-item > div, .grid > .archive-item > div > p {
+    margin: 0; 
+    padding: 0; 
+}
+
+.grid {
+    display: grid; 
+    grid-template-columns: auto auto auto auto;
+}
+
+.grid > .archive-item {
+    margin-left: 0.5vw; 
+    margin-right: 0.5vw; 
+    margin-bottom: 3vw; 
+    padding-bottom: 1vw; 
+    width: 22vw; 
+    /* border: 1px solid blue;  */
+}
+
+.grid > .archive-item > a > img {
+    width: 22vw; 
+    height: 14vw; 
+    object-fit: contain; 
+    background-color: black; 
+}
+
+.grid > .archive-item > div {
+    text-align: center; 
+    color: black; 
+}
+
+.grid > .archive-item > div > p:first-child {
+    margin-top: 0.5vw; 
+    font-size: 2vw; 
+    font-family: 'Garamond', 'Times New Roman', serif; 
+    /* font-weight: bold;  */
+}
+
+.grid > .archive-item > div > p:last-child {
+    margin-top: 0.2vw; 
+    font-size: 1.2vw; 
+    font-family: 'Tahoma', 'Verdana', monospace, sans-serif;
+}
+
+/* Highlight Page */
+
+.highlight-img {
+    width: 100%; 
+    height: 50vw; 
+    object-fit: contain; 
+}
+
+.highlight-info {
+    margin-left: 5vw; 
+    margin-right: 5vw; 
+    padding-bottom: 3vw; 
+    text-align: center; 
+    /* border-bottom: 1px solid black;  */
+}
+
+hr {
+    width: 70%; 
+}
+
+.highlight-info > h3 {
+    margin: 0; 
+    padding: 0; 
+    margin-top: 5vw; 
+    font-family: 'Garamond', 'Times New Roman', serif;
+    font-size: 3vw; 
+    font-weight: lighter; 
+}
+
+.highlight-info > p {
+    margin: 0; 
+    padding: 0; 
+    margin-top: 1.5vw; 
+    font-family: 'Tahoma', 'Verdana', monospace, sans-serif;
+    font-size: 1.2vw; 
+}
+
+.highlight-content {
+    margin-left: 8vw; 
+    margin-right: 8vw; 
+    margin-top: 4vw; 
+}
+
+.highlight-content > p {
+    font-size: 1.4vw; 
+    font-family: 'Tahoma', 'Verdana', monospace, sans-serif;
+}
+
+/* Issues Page */
+
+.issue-page > .issue {
+    width: 100%; 
+    height: 65vw; 
+    margin-bottom: 3vw; 
+}
+
+.issue-page > .issue img {
+    width: 100%; 
+    height: 45vw; 
+}
+
+/* Login Page */
+
+.form {
+    background-color: black; 
+    padding-top: 3vw; 
+    padding-bottom: 3vw; 
+    padding-left: 2vw; 
+    padding-right: 2vw; 
+}
+
+.form > form > label {
+    display: block; 
+    margin-bottom: 0.7vw; 
+    font-size: 1.5vw; 
+    font-family: 'Tahoma', 'Verdana', monospace, sans-serif;
+    /* font-family: 'Garamond', 'Times New Roman', serif;  */
+    color: white; 
+}
+
+.form > form > input {
+    display: block; 
+    width: 20vw; 
+    height: 3vw; 
+    margin-bottom: 2vw; 
+    border: 1px solid black; 
+    border-radius: 0; 
+}
+
+
+.form > form > select {
+    width: 100%; 
+    font-family: 'Tahoma', 'Verdana', monospace, sans-serif;
+    /* font-style: italic;  */
+    padding-left: 2vw; 
+    padding-top: 0.5vw; 
+    padding-bottom: 0.5vw; 
+    font-size: 1.1vw; 
+    margin-bottom: 2vw; 
+}
+
+.form > form > select > option {
+    font-size: 1.1vw; 
+    font-family: 'Tahoma', 'Verdana', monospace, sans-serif;
+    padding-left: 2vw; 
+    padding-top: 0.5vw; 
+    padding-bottom: 0.5vw; 
+}
+
+.form > form > input[type=file] {
+    margin: 0; 
+    color: white; 
+    width: 20vw; 
+    margin-bottom: 1vw; 
+}
+
+.form > form > input[type=file]::file-selector-button {
+    width: 7vw; 
+}
+
+.form > form > input:focus {
+    outline: none; 
+}
+
+.form > form > input[placeholder] {
+    padding-left: 2vw; 
+    color: grey; 
+    font-size: 1.1vw; 
+    font-style: italic; 
+    font-family: 'Tahoma', 'Verdana', monospace, sans-serif;
+}
+
+.form > form > button {
+    width: 8vw; 
+    font-size: 1.3vw; 
+    /* font-family:'Times New Roman', Times, serif; */
+    font-family: 'Tahoma', 'Verdana', monospace, sans-serif;
+}
+
+
+/* Admin Controls */
+
+.admin-bar {
+    display: flex; 
+    width: 100%; 
+    margin-bottom: 2vw; 
+    align-items: center;
+    background-color: black;
+    /* border: 1px solid red;   */
+}
+
+.admin-bar > p {
+    display: inline-block; 
+    width: 50vw; 
+    padding-left: 3vw; 
+    color: white; 
+    font-family: 'Tahoma', 'Verdana', monospace, sans-serif;
+    font-size: 1.4vw; 
+}
+
+.admin-bar > .buttons {
+    display: flex; 
+    width: 50vw; 
+    padding-right: 3vw; 
+    padding-top: 1vw; 
+    padding-bottom: 1vw; 
+    justify-content: right;
+    align-items: center; 
+}
+
+.admin-bar > .buttons > div {
+    margin-left: 1vw; 
+}
+
+.admin-bar > .buttons > div > button {
+    display: block; 
+    margin-bottom: 0.5vw;  
+    padding-top: 0.3vw; 
+    padding-bottom: 0.3vw; 
+    width: 10vw; 
+}
+
+.admin-bar > .buttons > div > button:last-child {
+    margin-bottom: 0; 
+}
+
+.admin-bar > .buttons > div > button > a {
+    text-decoration: none; 
+    font-size: 1vw; 
+    color: black; 
+    font-family:'Times New Roman', Times, serif;
 }

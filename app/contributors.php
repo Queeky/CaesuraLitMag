@@ -1,3 +1,8 @@
+<?php 
+    session_start(); 
+
+    include("includes/connection.inc.php"); 
+?>
 <!DOCTYPE html>
 <html>
     <head>

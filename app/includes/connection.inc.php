@@ -18,7 +18,95 @@ class Database {
         }
     }
 
+    // Sanitizes data to encode html chars and prevent SQL injection
+    function sanitize($data) {
+        $cleanData = []; 
+
+        foreach($data as $datum) {
+            $datum = mysqli_real_escape_string($this->conn, $datum); 
+            $datum = htmlspecialchars($datum); 
+
+            array_push($cleanData, $datum); 
+        }
+
+        return $cleanData; 
+    }
+
+    function insertValues($table, $selected, $values) {
+        // Sanitizing input
+        $values = $this->sanitize($values); 
+
+        $items = ""; 
+
+        foreach ($selected as $item) {
+            $items = $items . $item; 
+
+            if (next($selected) != null) {
+                $items = $items . ", "; 
+            }
+        }
+
+        $sql = "INSERT INTO $table ($items) "; 
+        $sql .= "VALUES ("; 
+
+        foreach ($values as $value) {
+            $sql .= "'$value'"; 
+
+            if (next($values) != null) {
+                $sql .= ", "; 
+            }
+        }
+
+        $sql .= ");"; 
+
+        // var_dump($sql); 
+
+        if (mysqli_query($this->conn, $sql) === true) {
+            return true; 
+        } else {
+            return false; 
+        }
+    }
+
+    // Checks if contributor already exists
+    // If true, returns id; if false, creates new contributor
+    function checkContributor($fName, $lName) {
+        // Sanitizing input
+        $names = $this->sanitize([$fName, $lName]); 
+        $names[0] = $fName; 
+        $names[1] = $lName; 
+
+        $check = $this->selectCustom("CONTRIBUTOR", ["*"], ["CON_FNAME", "CON_LNAME"], [$fName, $lName], ["=", "="]);
+        $conId = null; 
+
+        if ($check) {
+            foreach ($check as $con) {
+                $conId = $con["CON_ID"]; 
+            }
+
+            return $conId; 
+        } else {
+            $result = $this->insertValues("CONTRIBUTOR", ["CON_FNAME", "CON_LNAME"], [$fName, $lName]); 
+
+            if (!$result) {
+                echo "<p class='header-notif'>Error pushing $fName $lName to database.</p>"; 
+            } else {
+                echo "<p class='header-notif'>$fName $lName successfully added.</p>"; 
+                $newCon = $this->selectCustom("CONTRIBUTOR", ["MAX(CON_ID) AS CON_ID"]); 
+
+                foreach ($newCon as $id) {
+                    $conId = $id["CON_ID"]; 
+                }
+            }
+
+            return $conId; 
+        }
+    }
+
     function selectCustom($table, $selected, $wColumn = [], $wValue = [], $wOperator = [], $wCond = "AND", $jTable = [], $jColumn1 = [], $jColumn2 = []) {
+        // Sanitizing input
+        $wValue = $this->sanitize($wValue); 
+
         // Checking if selectCustom will successfully run
         if (count($wValue) != count($wColumn) || count($wOperator) != count($wColumn)) {
             print("wColumn, wValue, and wOperator must be the same length."); 
