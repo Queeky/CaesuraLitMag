@@ -12,6 +12,7 @@
         }
 
         // Put some kind of safety precautions
+        $removed = $database->deleteValues("WORK", "MEDIA_ID", $mediaId); 
         $removed = $database->deleteValues("MEDIA_TYPE", "MEDIA_ID", $mediaId); 
 
         if ($removed) {

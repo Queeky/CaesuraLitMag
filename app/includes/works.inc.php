@@ -16,9 +16,9 @@
     
     foreach ($queryArray as $keyword) {
         $mediaId = $database->selectCustom("MEDIA_TYPE", ["MEDIA_ID"], ["MEDIA_NAME"], [$keyword], ["="]); 
-        $issId = $database->selectCustom("ISSUE", ["ISS_ID"], ["ISS_NAME", "YEAR(ISS_DATE)"], [$keyword, $keyword], ["like", "="]); 
-        $conId = $database->selectCustom("CONTRIBUTOR", ["CON_ID"], ["CON_FNAME", "CON_LNAME"], [$keyword, $keyword], ["=", "="]);
-        $workId = $database->selectCustom("WORK", ["WORK_ID"], ["WORK_NAME", "WORK_CONTENT"], [$keyword, $keyword], ["=", "like"]);
+        $issId = $database->selectCustom("ISSUE", ["ISS_ID"], ["ISS_NAME", "YEAR(ISS_DATE)"], [$keyword, $keyword], ["like", "="], "OR"); 
+        $conId = $database->selectCustom("CONTRIBUTOR", ["CON_ID"], ["CON_FNAME", "CON_LNAME"], [$keyword, $keyword], ["=", "="], "OR");
+        $workId = $database->selectCustom("WORK", ["WORK_ID"], ["WORK_NAME", "WORK_CONTENT"], [$keyword, $keyword], ["=", "like"], "OR");
     
         // Checking if the ids exist
         // If yes, extracts (is this necessary) and adds elements to new array
@@ -58,12 +58,28 @@
         // var_dump($allIds);  
         // echo "<p>End of keys</p>"; 
     }
-    
-    if (!$query) {
-        $works = $database->selectCustom("WORK", ["WORK.WORK_ID", "WORK.WORK_NAME", "THUMBNAIL.THUMB_LINK", "THUMBNAIL.THUMB_DESCRIPT", "ISSUE.ISS_NAME", "ISSUE.ISS_DATE", "CONTRIBUTOR.CON_FNAME", "CONTRIBUTOR.CON_LNAME"], [], [], [], "OR", ["THUMBNAIL", "ISSUE", "CONTRIBUTOR"], ["WORK.THUMB_ID", "WORK.ISS_ID", "WORK.CON_ID"], ["THUMBNAIL.THUMB_ID", "ISSUE.ISS_ID", "CONTRIBUTOR.CON_ID"]); 
-    } else {
-        $works = $database->selectSearch($allIds); 
+
+    // Use switch statement to choose between searchKeys
+    switch($searchKey) {
+        case "query": 
+            $works = $database->selectSearch($allIds);
+            break; 
+        case "issue": 
+            $works = $database->selectCustom("WORK", ["WORK.WORK_ID", "WORK.WORK_NAME", "THUMBNAIL.THUMB_LINK", "THUMBNAIL.THUMB_DESCRIPT", "ISSUE.ISS_NAME", "ISSUE.ISS_DATE", "CONTRIBUTOR.CON_FNAME", "CONTRIBUTOR.CON_LNAME"], ["ISSUE.ISS_ID"], [$issue], ["="], "OR", ["THUMBNAIL", "ISSUE", "CONTRIBUTOR"], ["WORK.THUMB_ID", "WORK.ISS_ID", "WORK.CON_ID"], ["THUMBNAIL.THUMB_ID", "ISSUE.ISS_ID", "CONTRIBUTOR.CON_ID"]);
+            break; 
+        case "media": 
+            $works = $database->selectCustom("WORK", ["WORK.WORK_ID", "WORK.WORK_NAME", "THUMBNAIL.THUMB_LINK", "THUMBNAIL.THUMB_DESCRIPT", "ISSUE.ISS_NAME", "ISSUE.ISS_DATE", "CONTRIBUTOR.CON_FNAME", "CONTRIBUTOR.CON_LNAME"], ["MEDIA_ID"], [$media], ["="], "OR", ["THUMBNAIL", "ISSUE", "CONTRIBUTOR"], ["WORK.THUMB_ID", "WORK.ISS_ID", "WORK.CON_ID"], ["THUMBNAIL.THUMB_ID", "ISSUE.ISS_ID", "CONTRIBUTOR.CON_ID"]);
+            break;
+        default: 
+            $works = $database->selectCustom("WORK", ["WORK.WORK_ID", "WORK.WORK_NAME", "THUMBNAIL.THUMB_LINK", "THUMBNAIL.THUMB_DESCRIPT", "ISSUE.ISS_NAME", "ISSUE.ISS_DATE", "CONTRIBUTOR.CON_FNAME", "CONTRIBUTOR.CON_LNAME"], [], [], [], "OR", ["THUMBNAIL", "ISSUE", "CONTRIBUTOR"], ["WORK.THUMB_ID", "WORK.ISS_ID", "WORK.CON_ID"], ["THUMBNAIL.THUMB_ID", "ISSUE.ISS_ID", "CONTRIBUTOR.CON_ID"]);
+            break;  
     }
+    
+    // if (!$query) {
+    //     $works = $database->selectCustom("WORK", ["WORK.WORK_ID", "WORK.WORK_NAME", "THUMBNAIL.THUMB_LINK", "THUMBNAIL.THUMB_DESCRIPT", "ISSUE.ISS_NAME", "ISSUE.ISS_DATE", "CONTRIBUTOR.CON_FNAME", "CONTRIBUTOR.CON_LNAME"], [], [], [], "OR", ["THUMBNAIL", "ISSUE", "CONTRIBUTOR"], ["WORK.THUMB_ID", "WORK.ISS_ID", "WORK.CON_ID"], ["THUMBNAIL.THUMB_ID", "ISSUE.ISS_ID", "CONTRIBUTOR.CON_ID"]); 
+    // } else {
+    //     $works = $database->selectSearch($allIds); 
+    // }
 
     function displayWorks($works) {
         echo "<div class='grid'>"; 

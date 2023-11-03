@@ -25,20 +25,6 @@
                     displayIssue($results); 
                     displayWorks($results, $database); 
                 ?>
-        
-
-                        <!-- <li>
-                            <p class='title'>TWILIGHT STADIUM</p>
-                            <p class='contributor'>Quinn Miersma</p>
-                        </li>
-                        <li>
-                            <p class='title'>TWILIGHT STADIUM</p>
-                            <p class='contributor'>Quinn Miersma</p>
-                        </li>
-                        <li>
-                            <p class='title'>TWILIGHT STADIUM</p>
-                            <p class='contributor'>Quinn Miersma</p>
-                        </li> -->
             </div>
             <?php 
                 include("includes/sidebar.inc.php"); 

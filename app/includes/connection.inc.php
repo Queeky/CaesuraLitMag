@@ -174,7 +174,7 @@ class Database {
 
         $sql .= ";"; 
 
-        //var_dump($sql); 
+        // var_dump($sql); 
 
         $result = mysqli_query($this->conn, $sql);
         $array = mysqli_fetch_all($result, MYSQLI_ASSOC);

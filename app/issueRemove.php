@@ -12,6 +12,7 @@
         }
 
         // Put some kind of safety precautions
+        $removed = $database->deleteValues("WORK", "ISS_ID", $issId); 
         $removed = $database->deleteValues("ISSUE", "ISS_ID", $issId); 
 
         if ($removed) {

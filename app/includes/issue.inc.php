@@ -10,9 +10,11 @@
                 echo "</div>"; 
 
                 echo "<div class='issue-image'>"; 
-                echo "<img src='images/$issue[THUMB_LINK]' alt='$issue[THUMB_DESCRIPT]'>"; 
+                echo "<a href='archives.php?issue=$issue[ISS_ID]'><img src='images/$issue[THUMB_LINK]' alt='$issue[THUMB_DESCRIPT]'></a>"; 
                 echo "</div>"; 
 
+                // Eventually make the description a link, too; 
+                // Leads to where?
                 echo "<div class='issue-descript'>"; 
                 echo "<p>$issue[ISS_DESCRIPT]</p>"; 
                 echo "</div>"; 

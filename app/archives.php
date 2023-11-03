@@ -3,10 +3,25 @@
     include("includes/connection.inc.php"); 
 
     $query = null; 
+    $issue = null; 
+    $media = null; 
+    $searchKey = null; 
 
+    // Checking existence of all search variables
     if (isset($_GET['query'])) {
         $query = $_GET['query']; 
+        $searchKey = "query"; 
     } 
+
+    if (isset($_GET['issue'])) {
+        $issue = $_GET['issue']; 
+        $searchKey = "issue"; 
+    }
+
+    if (isset($_GET['media'])) {
+        $media = $_GET['media'];
+        $searchKey = "media"; 
+    }
 ?>
 <!DOCTYPE html>
 <html>

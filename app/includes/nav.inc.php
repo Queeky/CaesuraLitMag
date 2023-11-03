@@ -53,7 +53,7 @@ function displayNav($results) {
 
     // Dynamically adding media types to dropdown
     foreach ($results as $media) {
-        echo "<li><a href='archives.php' target='_blank'>$media[MEDIA_NAME]</a></li>";
+        echo "<li><a href='archives.php?media=$media[MEDIA_ID]' target='_blank'>$media[MEDIA_NAME]</a></li>";
     }
 
     echo "</ul>"; 
