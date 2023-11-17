@@ -32,7 +32,8 @@ class Database {
         return $cleanData; 
     }
 
-    function insertValues($table, $selected, $values) {
+    // Add where condition later
+    function insertValues($table, $selected = [], $values = []) {
         // Sanitizing input
         $values = $this->sanitize($values); 
 
@@ -68,10 +69,45 @@ class Database {
         }
     }
 
-    function deleteValues($table, $wCond, $wValue) {
-        // Only takes one wCond and wValue value because it is searching for the id
+    function deleteValues($table, $wColumn, $wValue) {
+        // Only takes one wColumn and wValue value because it is searching for the id
         $sql = "DELETE FROM $table "; 
-        $sql .= "WHERE $wCond = $wValue;"; 
+        $sql .= "WHERE $wColumn = $wValue;"; 
+
+        if (mysqli_query($this->conn, $sql) === true) {
+            return true; 
+        } else {
+            return false; 
+        }
+    }
+
+    function updateValues($table, $selected = [], $values = [], $wColumn = [], $wValue = [], $wCond = "AND") {
+        // Sanitizing input
+        $values = $this->sanitize($values); 
+
+        $sql = "UPDATE $table SET "; 
+
+        for ($i = 0; $i < count($selected); $i++) {
+            $sql .= "$selected[$i] = '$values[$i]' "; 
+
+            if (next($selected)) {
+                $sql .= ", "; 
+            }
+        }
+
+        for ($i = 0; $i < count($wColumn); $i++) {
+            if ($i == 0) {
+                $sql .= "WHERE "; 
+            }
+
+            $sql .= "$wColumn[$i] = $wValue[$i] "; 
+
+            if (next($wColumn)) {
+                $sql .= $wCond . " "; 
+            }
+        }
+
+        $sql .= ";"; 
 
         if (mysqli_query($this->conn, $sql) === true) {
             return true; 
@@ -82,6 +118,7 @@ class Database {
 
     // Checks if contributor already exists
     // If true, returns id; if false, creates new contributor
+    // NOTE: if no works contain contributor, remove from db
     function checkContributor($fName, $lName) {
         // Sanitizing input
         $names = $this->sanitize([$fName, $lName]); 

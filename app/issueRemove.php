@@ -1,24 +1,36 @@
 <?php
     session_start(); 
     include("includes/connection.inc.php"); 
+    include("includes/files.inc.php"); 
 
     if (isset($_POST["issRemove"])) {
         $issId = $_POST["issRemove"];
-        $issName = null; 
-        $names = $database->selectCustom("ISSUE", ["ISS_NAME"], ["ISS_ID"], [$issId], ["="]); 
+        $issName = null;
+        $thumbLink = null;  
+        $thumbId = null; 
+        $names = $database->selectCustom("ISSUE", ["ISSUE.ISS_NAME", "THUMBNAIL.THUMB_LINK", "THUMBNAIL.THUMB_ID"], ["ISS_ID"], [$issId], ["="], "AND", ["THUMBNAIL"], ["ISSUE.THUMB_ID"], ["THUMBNAIL.THUMB_ID"]); 
 
         foreach ($names as $name) {
             $issName = $name["ISS_NAME"]; 
+            $thumbLink = $name["THUMB_LINK"]; 
+            $thumbId = $name["THUMB_ID"]; 
         }
 
-        // Put some kind of safety precautions
-        $removed = $database->deleteValues("WORK", "ISS_ID", $issId); 
-        $removed = $database->deleteValues("ISSUE", "ISS_ID", $issId); 
+        
 
-        if ($removed) {
-            echo "<p class='header-notif'>$issName successfully removed.</p>";
-        } else {
-            echo "<p class='header-notif'>Error removing $issName from database.</p>"; 
+        // Removing thumbnail from images/
+        $deleteImg = $fileSystem->delete($thumbLink, "images"); 
+
+        if ($deleteImg) {
+            $removed = $database->deleteValues("WORK", "ISS_ID", $issId);  
+            $removed = $database->deleteValues("ISSUE", "ISS_ID", $issId); 
+            $removed = $database->deleteValues("THUMBNAIL", "THUMB_ID", $thumbId);
+
+            if ($removed) {
+                echo "<p class='header-notif'>$issName successfully removed.</p>";
+            } else {
+                echo "<p class='header-notif'>Error removing $issName from database.</p>"; 
+            }
         }
     }
 ?>

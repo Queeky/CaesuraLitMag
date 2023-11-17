@@ -2,7 +2,7 @@
     function displaySidebar($database) {
         echo "<div class='sidebar'>"; 
 
-        echo "<form action='archives.php' method='GET' target='_blank'>"; 
+        echo "<form action='archives.php' method='GET'>"; 
         echo "<label for='query'>SEARCH WORKS</label>";
         echo "<div>";  
         echo "<input type='text' name='query' placeholder='e.g. Jane Smith poetry 2020'>"; 
@@ -25,7 +25,7 @@
 
         foreach ($pastIssues as $issue) {
             $issue["ISS_NAME"] = strtoupper($issue["ISS_NAME"]); 
-            echo "<a href='#'><li>$issue[ISS_DATE] | $issue[ISS_NAME]</li></a>"; 
+            echo "<a href='archives.php?issue=$issue[ISS_ID]'><li>$issue[ISS_DATE] | $issue[ISS_NAME]</li></a>"; 
         }
 
         echo "</ul>"; 

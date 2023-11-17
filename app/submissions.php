@@ -2,6 +2,51 @@
     session_start(); 
 
     include("includes/connection.inc.php"); 
+
+    if (isset($_POST["update"])) {
+        $id = $_POST["update"]; 
+        $descript = $_POST["descript"]; 
+
+        if ($descript) {
+            $updated = $database->updateValues("GUIDELINE", ["GUIDE_DESCRIPT"], [$descript], ["GUIDE_ID"], [$id]); 
+
+            if ($updated) {
+                echo "<p class='header-notif'>Successfully updated.</p>";
+            } else {
+                echo "<p class='header-notif'>Error with update.</p>"; 
+            }
+        } else {
+            echo "<p class='header-notif'>A field is missing information.</p>"; 
+        }
+    }
+
+    if (isset($_POST["remove"])) {
+        $id = $_POST["remove"]; 
+        
+        $removed = $database->deleteValues("GUIDELINE", "GUIDE_ID", $id); 
+
+        if ($removed) {
+            echo "<p class='header-notif'>Guideline successfully removed.</p>";
+        } else {
+            echo "<p class='header-notif'>Error removing guideline from database.</p>"; 
+        }
+    }
+
+    if (isset($_POST["add"])) {
+        $descript = $_POST["descript"]; 
+
+        if ($descript) {
+            $added = $database->insertValues("GUIDELINE", ["GUIDE_DESCRIPT"], [$descript]); 
+
+            if ($added) {
+                echo "<p class='header-notif'>Guideline successfully added.</p>";
+            } else {
+                echo "<p class='header-notif'>Error pushing guideline to database.</p>"; 
+            }
+        } else {
+            echo "<p class='header-notif'>A field is missing information.</p>";
+        }
+    }
 ?>
 <!DOCTYPE html>
 <html>
@@ -19,14 +64,9 @@
 
         <div class='page-wrap'>
             <div class='content-wrap float-left'>
-                <p><strong>Please read carefully and follow the submission instructions. We cannot consider your submission until you have followed the submission instructions.</strong></p>
-                <ul class='guidelines'>
-                    <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Sed ullamcorper morbi tincidunt ornare massa eget.</li>
-                    <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Sed ullamcorper morbi tincidunt ornare massa eget.</li>
-                    <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Sed ullamcorper morbi tincidunt ornare massa eget.</li>
-                    <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Sed ullamcorper morbi tincidunt ornare massa eget.</li>
-                </ul>
-                <button><a href="#">Submit your work</a></button>
+                <?php
+                    include("includes/guidelines.inc.php"); 
+                ?>
             </div>
             <?php 
                 include("includes/sidebar.inc.php"); 

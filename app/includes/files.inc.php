@@ -2,8 +2,49 @@
 
 class FileSystem {
 
+    // Confirming the deletion of an object
+    function confirm($type, $name) {
+        $input = null; 
+
+        echo "<script>"; 
+
+        echo "var msg = null;"; 
+
+        switch ($type) {
+            case "issue": 
+                echo "msg = 'Deleting $name will also remove all works within this issue. Do you want to continue? (Y/N)';"; 
+                break; 
+            case "media": 
+                echo "msg = 'Deleting $name will also remove all works of this media type. Do you want to continue? (Y/N)';"; 
+                break; 
+            case "work": 
+                echo "var msg = '$name will be deleted. Do you want to continue? (Y/N)';"; 
+                break; 
+        }
+
+        echo "var input = prompt(msg);"; 
+        echo "</script>"; 
+
+        $input = "<script>document.write(input);</script>"; 
+
+        return $input; 
+    }
+
+    // Deleting a file
+    function delete($file, $type) {
+        if (unlink("$type/" . $file)) {
+            echo "<p class='header-notif'>$file successfully deleted.</p>";
+
+            return true; 
+        } else {
+            echo "<p class='header-notif'>$file was unable to be deleted.</p>";
+
+            return null; 
+        }
+    }
+
     // Uploading a file
-    function upload($file, $type) {
+    function upload($database, $file, $type) {
         if ($type != "docs" && $type != "images") {
             return null; 
         }
@@ -11,12 +52,6 @@ class FileSystem {
         $newFile = "$type/". basename($file["name"]);
         $uploadOk = 1;
         $fileType = strtolower(pathinfo($newFile, PATHINFO_EXTENSION));
-
-        // Checking if file already exists
-        if (file_exists($newFile)) {
-            echo "<p class='header-notif'>A file with this name and type already exists.</p>";
-            $uploadOk = 0;
-        }
 
         // Checking the file type
         switch($type) {
@@ -28,15 +63,26 @@ class FileSystem {
                 break; 
         }
 
+        // Checking if file already exists
+        // NOTE: if exists, make so that it uses existing file?
+        if (file_exists($newFile)) {
+            if ($type == "images") {
+                $database->insertValues
+            } else {
+                echo "<p class='header-notif'>A file with this name and type already exists.</p>";
+                $uploadOk = 0;
+            }
+        }
+
         if ($uploadOk == 0) {
             echo "<p class='header-notif'>Your file was not able to upload.</p>";
         } else {
             if (move_uploaded_file($file["tmp_name"], $newFile)) {
-                echo "<p class='header-notif'>Your file successfully uploaded.</p>";
+                echo "<p class='header-notif'>$file[name] successfully uploaded.</p>";
 
                 return true; 
             } else {
-                echo "<p class='header-notif'>There was an error with the upload.</p>";
+                echo "<p class='header-notif'>$file[name] was unable to upload.</p>";
             }
         }
 

@@ -1,4 +1,6 @@
 <?php
+
+
     session_start(); 
     include("includes/connection.inc.php"); 
     include("includes/files.inc.php"); 
@@ -16,6 +18,16 @@
         $conId = null;  
         $workContent = null; 
 
+        echo __DIR__; 
+
+        require_once "../vendor/autoload.php"; 
+        // $phpWord = new \PhpOffice\PhpWord\PhpWord();
+
+        // workfile not added to folder yet
+        // $phpWord = \PhpOffice\PhpWord\IOFactory::load("docs/" . $workFile["name"]);
+
+        // var_dump($phpWord); 
+
         if ($workName && $conFName && $conLName && $issId && $mediaId && $workFile && $thumb && $thumbDescript) {
             // Getting just the file name (no extension) 
             $thumbName = pathinfo($thumb["name"], PATHINFO_FILENAME);
@@ -31,10 +43,15 @@
             $uploadImg = $fileSystem->upload($thumb, "images"); 
 
             if ($uploadDoc) {
-                $workContent = file_get_contents("docs/$workFile[name]");  
+                $workContent = file_get_contents("docs/$workFile[name]"); 
+
+                // $workContent = \PhpOffice\PhpWord\IOFactory::load("images/$workFile[name]");
+                
+                // var_dump($workContent); 
 
                 if ($uploadImg) {
                     // Creating thumbnail item in database
+                    // NOTE: This will be in fileSystem instead
                     $newThumb = $database->insertValues("THUMBNAIL", ["THUMB_NAME", "THUMB_LINK", "THUMB_DESCRIPT"], [$thumbName, $thumb["name"], $thumbDescript]); 
 
                     // Getting id of new thumbnail item
@@ -43,15 +60,15 @@
                     foreach ($ids as $id) {
                         $thumbId = $id["THUMB_ID"]; 
                     }
+
+                    $added = $database->insertValues("WORK", ["CON_ID", "ISS_ID", "THUMB_ID", "MEDIA_ID", "WORK_NAME", "WORK_CONTENT", "WORK_LINK"], [$conId, $issId, $thumbId, $mediaId, $workName, $workContent, $workFile["name"]]); 
+
+                    if ($added) {
+                        echo "<p class='header-notif'>$workName successfully added.</p>";
+                    } else {
+                        echo "<p class='header-notif'>Error pushing $workName to database.</p>"; 
+                    }
                 }
-            }
-
-            $added = $database->insertValues("WORK", ["CON_ID", "ISS_ID", "THUMB_ID", "MEDIA_ID", "WORK_NAME", "WORK_CONTENT"], [$conId, $issId, $thumbId, $mediaId, $workName, $workContent]); 
-
-            if ($added) {
-                echo "<p class='header-notif'>$workName successfully added.</p>";
-            } else {
-                echo "<p class='header-notif'>Error pushing $workName to database.</p>"; 
             }
         } else {
             echo "<p class='header-notif'>A field is missing information.</p>";
