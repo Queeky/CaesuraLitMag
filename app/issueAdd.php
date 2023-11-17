@@ -63,7 +63,7 @@
                         <input type="text" name='issName' placeholder='Enter issue title'>
 
                         <label for="issDate">ISSUE DATE: </label>
-                        <input type="text" name='issDate' placeholder='Enter date (YYYY-MM-DD)'>
+                        <input type="date" name='issDate' placeholder=''>
                         <label for="issDescript">ISSUE DESCRIPTION: </label>
                         <input type="text" name='issDescript' placeholder='Enter description'>
 

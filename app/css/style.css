@@ -13,6 +13,11 @@
     --iss5Secondary: #9f8db0; 
 }
 
+* {
+    margin: 0; 
+    padding: 0; 
+}
+
 body, header, nav, footer, .sidebar, .page-wrap, .content-wrap {
     margin: 0; 
     padding: 0; 
@@ -50,6 +55,10 @@ body {
     background-color: var(--iss5Secondary); 
 }
 
+.empty-message {
+    /* Add here later */
+}
+
 /* Header  */
 
 header {
@@ -57,19 +66,19 @@ header {
     display: flex; 
     justify-content: center;
     align-items: center; 
-    height: 8vw; 
+    height: 7vw; 
 }
 
 header > h1 {
     display: inline-block; 
     font-family: 'Garamond', 'Times New Roman', serif; 
     font-weight: lighter; 
-    font-size: 5vw; 
+    font-size: 4.5vw; 
 }
 
 header > img {
     display: inline-block; 
-    width: 6vw; 
+    width: 5.5vw; 
     margin-left: 1vw; 
     margin-right: 1vw; 
     align-self: center; 
@@ -101,17 +110,17 @@ nav {
 .full-nav > ul > li {
     display: inline-block; 
     position: relative; 
-    padding-left: 1.5vw; 
-    padding-right: 1.5vw; 
-    padding-top: 1.2vw; 
-    padding-bottom: 1.2vw; 
+    padding-left: 1.3vw; 
+    padding-right: 1.3vw; 
+    padding-top: 1vw; 
+    padding-bottom: 1vw; 
 }
 
 .full-nav > ul > li > a {
     text-decoration: none; 
     color: black; 
     font-family: 'Tahoma', 'Verdana', monospace, sans-serif; 
-    font-size: 1.7vw; 
+    font-size: 1.5vw; 
 }
 
 .full-nav > ul > li:hover {
@@ -183,7 +192,8 @@ nav {
     display: none; 
     position: absolute; 
     left: -2px; 
-    top: 4.3vw; 
+    top: 3.8vw; 
+    /* This positioning needs to be fixed */
     min-width: 100%; 
     border: 2px solid white; 
     border-top: none;
@@ -191,16 +201,16 @@ nav {
 
 .sub-nav > li {
     display: block; 
-    padding-top: 0.5vw; 
-    padding-bottom: 0.5vw; 
-    padding-left: 1vw; 
-    padding-right: 1vw; 
+    padding-top: 0.7vw; 
+    padding-bottom: 0.7vw; 
+    padding-left: 0.5vw; 
+    padding-right: 0.5vw; 
 }
 
 .sub-nav > li > a {
     text-decoration: none; 
     font-family: 'Tahoma', 'Verdana', monospace, sans-serif; 
-    font-size: 95%;
+    font-size: 1.1vw;
     text-transform: uppercase; 
 }
 
@@ -492,6 +502,11 @@ footer {
     font-size: 1.5vw; 
 }
 
+.about-page {
+    font-size: 1.4vw; 
+    font-family: 'Tahoma', 'Verdana', monospace, sans-serif;
+}
+
 #mll-lobby {
     margin-top: 2vw; 
 }
@@ -540,6 +555,52 @@ footer {
     margin-top: 0.2vw; 
     font-size: 1.2vw; 
     font-family: 'Tahoma', 'Verdana', monospace, sans-serif;
+}
+
+/* Contacts Page */
+
+.contact-item {
+    margin-bottom: 1.5vw; 
+    padding-top: 1vw; 
+    padding-bottom: 1vw; 
+    width: 100%; 
+    background-color: #F8F8F8; 
+}
+
+.contact-info {
+    margin-left: 2vw; 
+}
+
+.contact-info > a {
+    display: block; 
+    font-family: 'Tahoma', 'Verdana', monospace, sans-serif;
+    font-size: 1.2vw; 
+    text-decoration: none; 
+    color: black; 
+}
+
+.contact-info > a:nth-child(3) {
+    margin-top: 1.5vw; 
+}
+
+.contact-info > a:nth-child(4) {
+    margin-top: 0.5vw; 
+}
+
+.contact-info > a:hover {
+    color: #020fc7; 
+}
+
+.contact-info > p {
+    display: inline-block; 
+    font-family: 'Garamond', 'Times New Roman', serif; 
+    font-size: 1.5vw; 
+}
+
+.contact-info > p:first-child {
+    margin-right: 2vw; 
+    text-transform: uppercase; 
+    font-weight: bold; 
 }
 
 /* Highlight Page */
@@ -603,7 +664,190 @@ hr {
     height: 45vw; 
 }
 
+/* Submissions Page */
+
+div.guidelines > p {
+    padding-bottom: 2vw; 
+    margin-bottom: 2vw; 
+    font-size: 1.5vw; 
+    font-family: 'Tahoma', 'Verdana', monospace, sans-serif;
+    font-weight: bold; 
+    border-bottom: 1px solid black; 
+}
+
+ul.guidelines {
+    margin-left: 2.5vw; 
+    font-size: 1.3vw; 
+    font-family: 'Tahoma', 'Verdana', monospace, sans-serif;
+}
+
+ul.guidelines > li {
+    margin-bottom: 1vw; 
+}
+
+div.guidelines .submit-btn.submittable {
+    margin-top: 4vw; 
+    width: 15vw; 
+    /* height: 4vw;  */
+}
+
+div.guidelines .submit-btn > a {
+    text-decoration: none; 
+    color: black; 
+    font-size: 1.2vw; 
+}
+
+/* Admin Controls */
+
+.admin-bar {
+    display: flex; 
+    width: 100%; 
+    margin-bottom: 2vw; 
+    align-items: center;
+    background-color: black;
+    /* border: 1px solid red;   */
+}
+
+.admin-bar > p {
+    display: inline-block; 
+    width: 50vw; 
+    padding-left: 3vw; 
+    color: white; 
+    font-family: 'Tahoma', 'Verdana', monospace, sans-serif;
+    font-size: 1.4vw; 
+}
+
+.admin-bar > .buttons {
+    display: flex; 
+    width: 50vw; 
+    padding-right: 3vw; 
+    padding-top: 1vw; 
+    padding-bottom: 1vw; 
+    justify-content: right;
+    align-items: center; 
+}
+
+.admin-bar > .buttons > div {
+    margin-left: 1vw; 
+}
+
+.admin-bar > .buttons > div > button {
+    display: block; 
+    margin-bottom: 0.5vw;  
+    padding-top: 0.3vw; 
+    padding-bottom: 0.3vw; 
+    width: 10vw; 
+}
+
+.admin-bar > .buttons > div > button:last-child {
+    margin-bottom: 0; 
+}
+
+.admin-bar > .buttons > div > button > a {
+    text-decoration: none; 
+    font-size: 1vw; 
+    color: black; 
+    font-family:'Times New Roman', Times, serif;
+}
+
+textarea.edit {
+    padding: 2vw; 
+    width: 60vw; 
+    height: 40vw; 
+    font-family: 'Tahoma', 'Verdana', monospace, sans-serif;
+    font-size: 1.4vw; 
+    box-sizing: border-box;
+}
+
+.add-form {
+    display: block; 
+    margin-bottom: 2vw; 
+    padding-top: 1vw; 
+    padding-bottom: 1vw; 
+    width: 100%;
+    background-color: #F8F8F8; 
+}
+
+.add-form > form {
+    margin-left: 2vw; 
+}
+
+.add-form > form > h3 {
+    margin-bottom: 2vw; 
+    font-family: 'Garamond', 'Times New Roman', serif;
+    font-size: 2vw; 
+}
+
+.add-form > form > input[type=text], .add-form > form > input[type=password] {
+    width: 20vw; 
+    height: 3vw; 
+    margin-bottom: 1vw; 
+    margin-right: 1vw; 
+    border: 1px solid black; 
+    border-radius: 0;
+}
+
+.add-form.contacts > form > input[type=text], .add-form.guidelines > form > input[type=text] {
+    display: inline-block;  
+}
+
+.add-form > form > input[placeholder] {
+    padding-left: 2vw; 
+    font-family: 'Tahoma', 'Verdana', monospace, sans-serif;
+    font-size: 1.1vw; 
+    color: grey; 
+}
+
+.contact-info > form > input[type=text] {
+    display: inline-block; 
+    width: 15vw; 
+    height: 3vw; 
+    margin-bottom: 1vw; 
+    margin-right: 1vw; 
+    border: 1px solid black; 
+    border-radius: 0; 
+}
+
+.contact-info > form > input[type=text]:last-child, .contact-info > form > input[type=text]:nth-child(4) {
+    display: block; 
+}
+
+.contact-info > form > input[placeholder] {
+    padding-left: 2vw; 
+    font-family: 'Tahoma', 'Verdana', monospace, sans-serif;
+    font-size: 1.1vw; 
+    color: grey; 
+}
+
+.submit-btn {
+    display: block; 
+    margin-bottom: 0.5vw;  
+    padding-top: 0.3vw; 
+    padding-bottom: 0.3vw; 
+    width: 10vw; 
+    font-family:'Times New Roman', Times, serif;
+    font-size: 1.1vw; 
+}
+
+.guide-info > form > textarea {
+    width: 100%; 
+    height: 10vw; 
+    padding: 1vw; 
+    font-family: 'Tahoma', 'Verdana', monospace, sans-serif;
+    font-size: 1.2vw;
+    box-sizing: border-box; 
+}
+
+.guide-info {
+    margin-top: 2vw; 
+}
+
+
 /* Login Page */
+
+.login > form > input {
+    display: block; 
+}
 
 .form {
     display: flex; 
@@ -712,56 +956,3 @@ hr {
     margin-bottom: 1.5vw; 
 }
 
-
-/* Admin Controls */
-
-.admin-bar {
-    display: flex; 
-    width: 100%; 
-    margin-bottom: 2vw; 
-    align-items: center;
-    background-color: black;
-    /* border: 1px solid red;   */
-}
-
-.admin-bar > p {
-    display: inline-block; 
-    width: 50vw; 
-    padding-left: 3vw; 
-    color: white; 
-    font-family: 'Tahoma', 'Verdana', monospace, sans-serif;
-    font-size: 1.4vw; 
-}
-
-.admin-bar > .buttons {
-    display: flex; 
-    width: 50vw; 
-    padding-right: 3vw; 
-    padding-top: 1vw; 
-    padding-bottom: 1vw; 
-    justify-content: right;
-    align-items: center; 
-}
-
-.admin-bar > .buttons > div {
-    margin-left: 1vw; 
-}
-
-.admin-bar > .buttons > div > button {
-    display: block; 
-    margin-bottom: 0.5vw;  
-    padding-top: 0.3vw; 
-    padding-bottom: 0.3vw; 
-    width: 10vw; 
-}
-
-.admin-bar > .buttons > div > button:last-child {
-    margin-bottom: 0; 
-}
-
-.admin-bar > .buttons > div > button > a {
-    text-decoration: none; 
-    font-size: 1vw; 
-    color: black; 
-    font-family:'Times New Roman', Times, serif;
-}

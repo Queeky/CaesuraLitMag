@@ -44,7 +44,7 @@
         ?>
         <div class='page-wrap'>
             <div class='content-wrap'>
-                <div class='form'>
+                <div class='add-form login'>
                     <?php 
                         echo "<form action='login.php' method='POST'>";
 
@@ -53,9 +53,9 @@
                             echo "<input type='text' name='admName' placeholder='Enter username'>"; 
                             echo "<label for='admPass'>PASSWORD: </label>"; 
                             echo "<input type='password' name='admPass' placeholder='Enter password'>";
-                            echo "<button type='submit' name='loginSubmit'>Log In</button>";  
+                            echo "<button class='submit-btn' type='submit' name='loginSubmit'>Log In</button>";  
                         } else {
-                            echo "<button type='submit' name='logoutSubmit'>Log Out</button>"; 
+                            echo "<button class='submit-btn' type='submit' name='logoutSubmit'>Log Out</button>"; 
                         }
 
                         echo "</form>"; 

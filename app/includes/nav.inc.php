@@ -9,6 +9,11 @@ function displayAdmin() {
         echo "<p>Welcome back, $_SESSION[admName]</p>"; 
         echo "<div class='buttons'>"; 
         echo "<div>"; 
+        echo "<button><a href='about.php'>Update About</a></button>"; 
+        echo "<button><a href='contacts.php'>Update Contacts</a></button>"; 
+        echo "<button><a href='submissions.php'>Update Guidelines</a></button>"; 
+        echo "</div>"; 
+        echo "<div>"; 
         echo "<button><a href='mediaAdd.php'>Add Media</a></button>"; 
         echo "<button><a href='issueAdd.php'>Add Issues</a></button>"; 
         echo "<button><a href='workAdd.php'>Add Works</a></button>"; 
@@ -41,19 +46,19 @@ function displayNav($results) {
 
     echo "<div class='full-nav'>"; 
     echo "<ul>"; 
-    echo "<li><a href='index.php' target='_blank'>HOME</a></li>"; 
-    echo "<li><a href='about.php' target='_blank'>ABOUT</a></li>"; 
+    echo "<li><a href='index.php'>HOME</a></li>"; 
+    echo "<li><a href='about.php'>ABOUT</a></li>"; 
 
     // Archives link and dropdown
     echo "<li class='archives-li'>"; 
-    echo "<a href='archives.php' target='_blank'>ARCHIVES</a>"; 
+    echo "<a href='archives.php'>ARCHIVES</a>"; 
     echo "<ul class='sub-nav archives'>"; 
 
-    echo "<li><a href='archives.php' target='_blank'>ALL TYPES</a></li>";
+    echo "<li><a href='archives.php'>ALL TYPES</a></li>";
 
     // Dynamically adding media types to dropdown
     foreach ($results as $media) {
-        echo "<li><a href='archives.php?media=$media[MEDIA_ID]' target='_blank'>$media[MEDIA_NAME]</a></li>";
+        echo "<li><a href='archives.php?media=$media[MEDIA_ID]'>$media[MEDIA_NAME]</a></li>";
     }
 
     echo "</ul>"; 
@@ -61,19 +66,19 @@ function displayNav($results) {
 
     // Contacts link and dropdown
     echo "<li class='contacts-li'>"; 
-    echo "<a href='contacts.php' target='_blank'>CONTACTS</a>";
+    echo "<a href='contacts.php'>CONTACTS</a>";
     echo "<ul class='sub-nav contacts'>"; 
-    echo "<li><a href='contacts.php' target='_blank'>STAFF</a></li>";
-    echo "<li><a href='contributors.php' target='_blank'>CONTRIBUTORS</a></li>";  
+    echo "<li><a href='contacts.php'>STAFF</a></li>";
+    echo "<li><a href='contributors.php'>CONTRIBUTORS</a></li>";  
     echo "</ul>"; 
     echo "</li>"; 
 
     // Submissions link and dropdown
     echo "<li class='submissions-li'>"; 
-    echo "<a href='submissions.php' target='_blank'>SUBMISSIONS</a>"; 
+    echo "<a href='submissions.php'>SUBMISSIONS</a>"; 
     echo "<ul class='sub-nav submissions'>"; 
-    echo "<li><a href='submissions.php' target='_blank'>GUIDELINES</a></li>"; 
-    echo "<li><a href='issues.php' target='_blank'>PAST ISSUES</a></li>"; 
+    echo "<li><a href='submissions.php'>GUIDELINES</a></li>"; 
+    echo "<li><a href='issues.php'>PAST ISSUES</a></li>"; 
     echo "</ul>"; 
     echo "</li>"; 
 

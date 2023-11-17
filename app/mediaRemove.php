@@ -1,6 +1,7 @@
 <?php
     session_start(); 
     include("includes/connection.inc.php"); 
+    include("includes/files.inc.php"); 
 
     if (isset($_POST["mediaRemove"])) {
         $mediaId = $_POST["mediaRemove"];
@@ -11,14 +12,23 @@
             $mediaName = $name["MEDIA_NAME"]; 
         }
 
-        // Put some kind of safety precautions
-        $removed = $database->deleteValues("WORK", "MEDIA_ID", $mediaId); 
-        $removed = $database->deleteValues("MEDIA_TYPE", "MEDIA_ID", $mediaId); 
+        // Prompting user to confirm deletion
+        $confirm = $fileSystem->confirm("media", $mediaName); 
+        // $confirm = mb_strtolower($confirm); 
+        echo gettype($confirm);
+        echo "CONFIRM: " . $confirm;  
+        // Figure this out later, maybe never
+        
 
-        if ($removed) {
-            echo "<p class='header-notif'>$mediaName successfully removed.</p>";
-        } else {
-            echo "<p class='header-notif'>Error removing $mediaName from database.</p>"; 
+        if ($confirm == "y" || $confirm == "Y") {
+            $removed = $database->deleteValues("WORK", "MEDIA_ID", $mediaId); 
+            $removed = $database->deleteValues("MEDIA_TYPE", "MEDIA_ID", $mediaId); 
+
+            if ($removed) {
+                echo "<p class='header-notif'>$mediaName successfully removed.</p>";
+            } else {
+                echo "<p class='header-notif'>Error removing $mediaName from database.</p>"; 
+            }
         }
     }
 ?>

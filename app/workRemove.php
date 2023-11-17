@@ -1,23 +1,36 @@
 <?php
     session_start(); 
-    include("includes/connection.inc.php"); 
+    include("includes/connection.inc.php");
+    include("includes/files.inc.php");  
 
     if (isset($_POST["workRemove"])) {
         $workId = $_POST["workRemove"];
         $workName = null; 
-        $names = $database->selectCustom("WORK", ["WORK_NAME"], ["WORK_ID"], [$workId], ["="]); 
+        $workLink = null; 
+        $thumbLink = null; 
+        $thumbId = null; 
+        $results = $database->selectCustom("WORK", ["WORK.WORK_NAME", "WORK.WORK_LINK", "THUMBNAIL.THUMB_LINK", "THUMBNAIL.THUMB_ID"], ["WORK_ID"], [$workId], ["="], "AND", ["THUMBNAIL"], ["WORK.THUMB_ID"], ["THUMBNAIL.THUMB_ID"]); 
 
-        foreach ($names as $name) {
+        foreach ($results as $item) {
             $workName = $name["WORK_NAME"]; 
+            $workLink = $name["WORK_LINK"]; 
+            $thumbLink = $name["THUMB_LINK"]; 
+            $thumbId = $name["THUMB_ID"]; 
         }
 
-        // Put some kind of safety precautions
-        $removed = $database->deleteValues("WORK", "WORK_ID", $workId); 
+        // Removing thumbnail from images/ and doc from docs/
+        $deleteImg = $fileSystem->delete($thumbLink, "images"); 
+        $deleteDoc = $fileSystem->delete($workLink, "docs"); 
 
-        if ($removed) {
-            echo "<p class='header-notif'>$workName successfully removed.</p>";
-        } else {
-            echo "<p class='header-notif'>Error removing $workName from database.</p>"; 
+        if ($deleteImg && $deleteDoc) {
+            // Put some kind of safety precautions
+            $removed = $database->deleteValues("WORK", "WORK_ID", $workId); 
+
+            if ($removed) {
+                echo "<p class='header-notif'>$workName successfully removed.</p>";
+            } else {
+                echo "<p class='header-notif'>Error removing $workName from database.</p>"; 
+            }
         }
     }
 ?>

@@ -74,27 +74,27 @@
             $works = $database->selectCustom("WORK", ["WORK.WORK_ID", "WORK.WORK_NAME", "THUMBNAIL.THUMB_LINK", "THUMBNAIL.THUMB_DESCRIPT", "ISSUE.ISS_NAME", "ISSUE.ISS_DATE", "CONTRIBUTOR.CON_FNAME", "CONTRIBUTOR.CON_LNAME"], [], [], [], "OR", ["THUMBNAIL", "ISSUE", "CONTRIBUTOR"], ["WORK.THUMB_ID", "WORK.ISS_ID", "WORK.CON_ID"], ["THUMBNAIL.THUMB_ID", "ISSUE.ISS_ID", "CONTRIBUTOR.CON_ID"]);
             break;  
     }
-    
-    // if (!$query) {
-    //     $works = $database->selectCustom("WORK", ["WORK.WORK_ID", "WORK.WORK_NAME", "THUMBNAIL.THUMB_LINK", "THUMBNAIL.THUMB_DESCRIPT", "ISSUE.ISS_NAME", "ISSUE.ISS_DATE", "CONTRIBUTOR.CON_FNAME", "CONTRIBUTOR.CON_LNAME"], [], [], [], "OR", ["THUMBNAIL", "ISSUE", "CONTRIBUTOR"], ["WORK.THUMB_ID", "WORK.ISS_ID", "WORK.CON_ID"], ["THUMBNAIL.THUMB_ID", "ISSUE.ISS_ID", "CONTRIBUTOR.CON_ID"]); 
-    // } else {
-    //     $works = $database->selectSearch($allIds); 
-    // }
 
     function displayWorks($works) {
-        echo "<div class='grid'>"; 
+        if ($works) {
+            echo "<div class='grid'>"; 
 
-        foreach ($works as $work) {
-            echo "<div class='archive-item'>"; 
-            echo "<a href='highlight.php?id=$work[WORK_ID]'><img src='images/$work[THUMB_LINK]' alt='$work[THUMB_DESCRIPT]'></a>"; 
-            echo "<div>"; 
-            echo "<p>$work[WORK_NAME]</p>"; 
-            echo "<p>$work[CON_FNAME] $work[CON_LNAME]</p>";
+            foreach ($works as $work) {
+                echo "<div class='archive-item'>"; 
+                echo "<a href='highlight.php?id=$work[WORK_ID]'><img src='images/$work[THUMB_LINK]' alt='$work[THUMB_DESCRIPT]'></a>"; 
+                echo "<div>"; 
+                echo "<p>$work[WORK_NAME]</p>"; 
+                echo "<p>$work[CON_FNAME] $work[CON_LNAME]</p>";
+                echo "</div>"; 
+                echo "</div>"; 
+            }
+
             echo "</div>"; 
-            echo "</div>"; 
+        } else {
+            echo "<p class='empty-message'>"; 
+            echo "Nothing's here right now!"; 
+            echo "</p>"; 
         }
-
-        echo "</div>"; 
     }
 
     displayWorks($works); 
