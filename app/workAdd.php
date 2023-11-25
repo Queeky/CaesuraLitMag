@@ -1,6 +1,4 @@
 <?php
-
-
     session_start(); 
     include("includes/connection.inc.php"); 
     include("includes/files.inc.php"); 
@@ -18,15 +16,6 @@
         $conId = null;  
         $workContent = null; 
 
-        echo __DIR__; 
-
-        require_once "../vendor/autoload.php"; 
-        // $phpWord = new \PhpOffice\PhpWord\PhpWord();
-
-        // workfile not added to folder yet
-        // $phpWord = \PhpOffice\PhpWord\IOFactory::load("docs/" . $workFile["name"]);
-
-        // var_dump($phpWord); 
 
         if ($workName && $conFName && $conLName && $issId && $mediaId && $workFile && $thumb && $thumbDescript) {
             // Getting just the file name (no extension) 
@@ -36,18 +25,22 @@
             $conFName = ucfirst(strtolower($conFName));
             $conLName = ucfirst(strtolower($conLName));
 
+            // Uncomment this when testing done
             $conId = $database->checkContributor($conFName, $conLName); 
 
             // Uploading files to docs/ and images/
             $uploadDoc = $fileSystem->upload($workFile, "docs"); 
             $uploadImg = $fileSystem->upload($thumb, "images"); 
 
-            if ($uploadDoc) {
-                $workContent = file_get_contents("docs/$workFile[name]"); 
+            include("includes/readFromFile.inc.php"); 
 
-                // $workContent = \PhpOffice\PhpWord\IOFactory::load("images/$workFile[name]");
-                
-                // var_dump($workContent); 
+            if ($uploadDoc) {
+                $fileType = strtolower(pathinfo(basename($workFile["name"]), PATHINFO_EXTENSION)); // Getting file extension
+                $workContent = readFromFile($workFile["name"], $fileType); 
+
+                $workContent = nl2br($workContent); 
+
+                // $uploadImg = false; // For testing only!
 
                 if ($uploadImg) {
                     // Creating thumbnail item in database

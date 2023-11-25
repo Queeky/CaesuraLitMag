@@ -16,7 +16,7 @@
             $thumbName = pathinfo($thumb["name"], PATHINFO_FILENAME);
 
             // Uploading file to images/
-            $uploadImg = $fileSystem->upload($thumb, "images"); 
+            $uploadImg = $fileSystem->upload($database, $thumb, "images"); 
 
             if ($uploadImg) {
                 // Creating thumbnail item in database

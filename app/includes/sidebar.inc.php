@@ -21,11 +21,17 @@
         echo "<label for='#'>PAST ISSUES</label>"; 
         echo "<ul>"; 
 
-        $pastIssues = $database->selectCustom("ISSUE", ["YEAR(ISS_DATE) AS ISS_DATE", "ISS_ID", "LEFT(ISS_NAME, 15) AS ISS_NAME"], [], [], [], "AND", [], [], [], "ISS_DATE DESC"); 
+        $pastIssues = $database->selectCustom("ISSUE", ["YEAR(ISS_DATE) AS ISS_DATE", "ISS_ID", "LEFT(ISS_NAME, 15) AS ISS_NAME"], order: "ISS_DATE DESC"); 
 
-        foreach ($pastIssues as $issue) {
-            $issue["ISS_NAME"] = strtoupper($issue["ISS_NAME"]); 
-            echo "<a href='archives.php?issue=$issue[ISS_ID]'><li>$issue[ISS_DATE] | $issue[ISS_NAME]</li></a>"; 
+        if ($pastIssues) {
+            foreach ($pastIssues as $issue) {
+                $issue["ISS_NAME"] = strtoupper($issue["ISS_NAME"]); 
+                echo "<a href='archives.php?issue=$issue[ISS_ID]'><li>$issue[ISS_DATE] | $issue[ISS_NAME]</li></a>"; 
+            }
+        } else {
+            echo "<div class='empty-message small'>"; 
+            echo "<p>Nothing's here at the moment!</p>"; 
+            echo "</div>"; 
         }
 
         echo "</ul>"; 

@@ -44,7 +44,7 @@ class FileSystem {
     }
 
     // Uploading a file
-    function upload($database, $file, $type) {
+    function upload($file, $type) {
         if ($type != "docs" && $type != "images") {
             return null; 
         }
@@ -66,12 +66,15 @@ class FileSystem {
         // Checking if file already exists
         // NOTE: if exists, make so that it uses existing file?
         if (file_exists($newFile)) {
-            if ($type == "images") {
-                $database->insertValues
-            } else {
-                echo "<p class='header-notif'>A file with this name and type already exists.</p>";
-                $uploadOk = 0;
-            }
+            // if ($type == "images") {
+            //     // $database->insertValues
+            // } else {
+            //     echo "<p class='header-notif'>A file with this name and type already exists.</p>";
+            //     $uploadOk = 0;
+            // }
+
+            echo "<p class='header-notif'>A file with this name and type already exists.</p>";
+            $uploadOk = 0;
         }
 
         if ($uploadOk == 0) {
@@ -91,7 +94,7 @@ class FileSystem {
 
     // Checking if doc fits accepted file types
     function checkDoc($fileType, $uploadOk) {
-        if ($fileType != "doc" && $fileType != "docx" && $fileType != "txt") {
+        if ($fileType != "doc" && $fileType != "docx" && $fileType != "rtf" && $fileType != "txt") {
             echo "<p class='header-notif'>Cannot accept file type $fileType.</p>";
             $uploadOk = 0; 
         }

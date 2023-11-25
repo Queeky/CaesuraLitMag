@@ -1,6 +1,6 @@
 <?php 
 
-$contacts = $database->selectCustom("CONTACT", ["*"], [], [], [], "AND", ["THUMBNAIL"], ["CONTACT.THUMB_ID"], ["THUMBNAIL.THUMB_ID"]); 
+$contacts = $database->selectCustom("CONTACT", ["*"], jTable: ["THUMBNAIL"], jColumn1: ["CONTACT.THUMB_ID"], jColumn2: ["THUMBNAIL.THUMB_ID"]); 
 
 // Displaying contacts as seen by user
 function displayContacts($contacts) {
@@ -19,7 +19,9 @@ function displayContacts($contacts) {
             echo "</div>"; 
         }
     } else {
-        echo "<p class='empty-message'>Nothing's here at the moment!</p>"; 
+        echo "<div class='empty-message large'>"; 
+        echo "<p>Nothing's here at the moment!</p>"; 
+        echo "</div>";
     }
 }
 

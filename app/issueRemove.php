@@ -19,7 +19,7 @@
         
 
         // Removing thumbnail from images/
-        $deleteImg = $fileSystem->delete($thumbLink, "images"); 
+        $deleteImg = $fileSystem->delete($database, $thumbLink, "images"); 
 
         if ($deleteImg) {
             $removed = $database->deleteValues("WORK", "ISS_ID", $issId);  

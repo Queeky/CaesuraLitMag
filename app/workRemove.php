@@ -19,8 +19,8 @@
         }
 
         // Removing thumbnail from images/ and doc from docs/
-        $deleteImg = $fileSystem->delete($thumbLink, "images"); 
-        $deleteDoc = $fileSystem->delete($workLink, "docs"); 
+        $deleteImg = $fileSystem->delete($database, $thumbLink, "images"); 
+        $deleteDoc = $fileSystem->delete($database, $workLink, "docs"); 
 
         if ($deleteImg && $deleteDoc) {
             // Put some kind of safety precautions

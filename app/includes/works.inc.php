@@ -13,6 +13,8 @@
     $workKeys = array();
     
     $allIds = array(); 
+
+    $works = null; 
     
     foreach ($queryArray as $keyword) {
         $mediaId = $database->selectCustom("MEDIA_TYPE", ["MEDIA_ID"], ["MEDIA_NAME"], [$keyword], ["="]); 
@@ -21,7 +23,7 @@
         $workId = $database->selectCustom("WORK", ["WORK_ID"], ["WORK_NAME", "WORK_CONTENT"], [$keyword, $keyword], ["=", "like"], "OR");
     
         // Checking if the ids exist
-        // If yes, extracts (is this necessary) and adds elements to new array
+        // If yes, extracts and adds elements to new array
         if ($mediaId) {
             foreach ($mediaId as $id) {
                 array_push($mediaKeys, $id["MEDIA_ID"]); 
@@ -71,14 +73,16 @@
             $works = $database->selectCustom("WORK", ["WORK.WORK_ID", "WORK.WORK_NAME", "THUMBNAIL.THUMB_LINK", "THUMBNAIL.THUMB_DESCRIPT", "ISSUE.ISS_NAME", "ISSUE.ISS_DATE", "CONTRIBUTOR.CON_FNAME", "CONTRIBUTOR.CON_LNAME"], ["MEDIA_ID"], [$media], ["="], "OR", ["THUMBNAIL", "ISSUE", "CONTRIBUTOR"], ["WORK.THUMB_ID", "WORK.ISS_ID", "WORK.CON_ID"], ["THUMBNAIL.THUMB_ID", "ISSUE.ISS_ID", "CONTRIBUTOR.CON_ID"]);
             break;
         default: 
-            $works = $database->selectCustom("WORK", ["WORK.WORK_ID", "WORK.WORK_NAME", "THUMBNAIL.THUMB_LINK", "THUMBNAIL.THUMB_DESCRIPT", "ISSUE.ISS_NAME", "ISSUE.ISS_DATE", "CONTRIBUTOR.CON_FNAME", "CONTRIBUTOR.CON_LNAME"], [], [], [], "OR", ["THUMBNAIL", "ISSUE", "CONTRIBUTOR"], ["WORK.THUMB_ID", "WORK.ISS_ID", "WORK.CON_ID"], ["THUMBNAIL.THUMB_ID", "ISSUE.ISS_ID", "CONTRIBUTOR.CON_ID"]);
+            $works = $database->selectCustom("WORK", ["WORK.WORK_ID", "WORK.WORK_NAME", "THUMBNAIL.THUMB_LINK", "THUMBNAIL.THUMB_DESCRIPT", "ISSUE.ISS_NAME", "ISSUE.ISS_DATE", "CONTRIBUTOR.CON_FNAME", "CONTRIBUTOR.CON_LNAME"], jTable: ["THUMBNAIL", "ISSUE", "CONTRIBUTOR"], jColumn1: ["WORK.THUMB_ID", "WORK.ISS_ID", "WORK.CON_ID"], jColumn2: ["THUMBNAIL.THUMB_ID", "ISSUE.ISS_ID", "CONTRIBUTOR.CON_ID"]);
             break;  
     }
 
-    function displayWorks($works) {
-        if ($works) {
-            echo "<div class='grid'>"; 
+    // var_dump(count($works)); 
 
+    function displayWorks($works) {
+        echo "<div class='grid'>"; 
+
+        if ($works) {
             foreach ($works as $work) {
                 echo "<div class='archive-item'>"; 
                 echo "<a href='highlight.php?id=$work[WORK_ID]'><img src='images/$work[THUMB_LINK]' alt='$work[THUMB_DESCRIPT]'></a>"; 
@@ -88,13 +92,13 @@
                 echo "</div>"; 
                 echo "</div>"; 
             }
-
-            echo "</div>"; 
         } else {
-            echo "<p class='empty-message'>"; 
-            echo "Nothing's here right now!"; 
-            echo "</p>"; 
+            echo "<div class='empty-message large>"; 
+            echo "<p>Nothing's here at the moment!</p>"; 
+            echo "</div>";
         }
+
+        echo "</div>"; 
     }
 
     displayWorks($works); 
