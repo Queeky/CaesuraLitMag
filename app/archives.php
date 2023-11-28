@@ -38,7 +38,7 @@
             $conId = null; 
             $content = null; 
 
-            if ($title && $fname && $lname && $issue && $media && $doc && $thumb && $thumbDescript) {
+            if ($title && $fname && $lname && $issue && $media && $doc["name"] && $thumb["name"] && $thumbDescript) {
                 // Getting just the file name (no extension) 
                 $thumbName = pathinfo($thumb["name"], PATHINFO_FILENAME);
 
@@ -60,8 +60,6 @@
     
                     $content = nl2br($content); 
     
-                    // $uploadImg = false; // For testing only!
-    
                     if ($uploadImg) {
                         // Creating thumbnail item in database
                         $database->insertValues("THUMBNAIL", ["THUMB_NAME", "THUMB_LINK", "THUMB_DESCRIPT"], [$thumbName, $uploadImg, $thumbDescript]); 
@@ -80,6 +78,71 @@
                         } else {
                             echo "<p class='header-notif'>Error pushing $title to database.</p>"; 
                         }
+                    }
+                }
+            } else if ($title && $fname && $lname && $issue && $media && $thumb["name"] && $thumbDescript) {
+                // Getting just the file name (no extension) 
+                $thumbName = pathinfo($thumb["name"], PATHINFO_FILENAME);
+
+                // Formatting data
+                $fname = ucfirst(strtolower($fname));
+                $lname = ucfirst(strtolower($lname));
+
+                $conId = $database->checkContributor($fname, $lname); 
+                $content = $thumbDescript; 
+
+                // Uploading file to images/
+                $uploadImg = $fileSystem->upload($thumb, "images");
+
+                // Creating thumbnail item in database
+                $database->insertValues("THUMBNAIL", ["THUMB_NAME", "THUMB_LINK", "THUMB_DESCRIPT"], [$thumbName, $uploadImg, $thumbDescript]); 
+    
+                // Getting id of new thumbnail item
+                $ids = $database->selectCustom("THUMBNAIL", ["MAX(THUMB_ID) AS THUMB_ID"]); 
+
+                foreach ($ids as $item) {
+                    $thumbId = $item["THUMB_ID"]; 
+                }
+
+                $added = $database->insertValues("WORK", ["CON_ID", "ISS_ID", "THUMB_ID", "MEDIA_ID", "WORK_NAME", "WORK_CONTENT", "WORK_LINK"], [$conId, $issue, $thumbId, $media, $title, $content, $uploadImg]); 
+
+                if ($added) {
+                    echo "<p class='header-notif'>$title successfully added.</p>";
+                } else {
+                    echo "<p class='header-notif'>Error pushing $title to database.</p>"; 
+                }
+            } else if ($title && $fname && $lname && $issue && $media && $doc["name"]) {
+                // Getting just the file name (no extension) 
+                $thumbName = pathinfo($thumb["name"], PATHINFO_FILENAME);
+
+                // Formatting data
+                $fname = ucfirst(strtolower($fname));
+                $lname = ucfirst(strtolower($lname));
+
+                $conId = $database->checkContributor($fname, $lname); 
+
+                // Uploading files to docs/ 
+                $uploadDoc = $fileSystem->upload($doc, "docs"); 
+
+                include("includes/readFromFile.inc.php");
+
+                if ($uploadDoc) {
+                    $fileType = strtolower(pathinfo(basename($doc["name"]), PATHINFO_EXTENSION)); // Getting file extension
+                    $content = readFromFile($uploadDoc, $fileType); 
+    
+                    $content = nl2br($content); 
+
+                    $issueThumb = $database->selectCustom("ISSUE", ["THUMB_ID"], ["ISS_ID"], [$issue], ["="]); 
+                    foreach ($issueThumb as $item) {
+                        $thumbId = $item["THUMB_ID"]; 
+                    }
+
+                    $added = $database->insertValues("WORK", ["CON_ID", "ISS_ID", "THUMB_ID", "MEDIA_ID", "WORK_NAME", "WORK_CONTENT", "WORK_LINK"], [$conId, $issue, $thumbId, $media, $title, $content, $uploadDoc]); 
+
+                    if ($added) {
+                        echo "<p class='header-notif'>$title successfully added.</p>";
+                    } else {
+                        echo "<p class='header-notif'>Error pushing $title to database.</p>"; 
                     }
                 }
             } else {
@@ -114,22 +177,79 @@
             $fileSystem->confirm(); 
         } else if (isset($_POST["yes"])) {
             // Removing thumbnail from images/ and doc from docs/
-            // NEEDS TO CHECK if img file is still in use****
-            $deleteImg = $fileSystem->delete($_SESSION["thumbLink"]); 
-            $deleteDoc = $fileSystem->delete($_SESSION["docLink"]); 
+            $used = $database->checkUsed($_SESSION["thumbId"]); 
 
-            if ($deleteImg && $deleteDoc) {
-                $removed = $database->deleteValues("WORK", "WORK_ID", $_SESSION["id"]); 
-                $removed = $database->deleteValues("THUMBNAIL", "THUMB_ID", $_SESSION["thumbId"]); 
-    
-                if ($removed) {
-                    echo "<p class='header-notif'>$_SESSION[title] successfully removed.</p>";
-                } else {
-                    echo "<p class='header-notif'>Error removing $_SESSION[title] from database.</p>"; 
-                }
+            if (isset($_SESSION["docLink"])) {
+                $fileSystem->delete($_SESSION["docLink"]); 
+            }
+ 
+            $removed = $database->deleteValues("WORK", "WORK_ID", $_SESSION["id"]); 
+
+            if (!$used) {
+                $fileSystem->delete($_SESSION["thumbLink"]);
+                $database->deleteValues("THUMBNAIL", "THUMB_ID", $_SESSION["thumbId"]); 
+            }
+
+            if ($removed) {
+                echo "<p class='header-notif'>$_SESSION[title] successfully removed.</p>";
+            } else {
+                echo "<p class='header-notif'>Error removing $_SESSION[title] from database.</p>"; 
             }
         } else if (isset($_POST["update"])) {
-            // Update
+            $id = $_POST["update"]; 
+            $thumb = $_FILES["thumb"]; 
+            $descript = $_POST["descript"]; 
+            $thumbId = null; 
+            $oldLink = null; 
+            $oldId = null; 
+
+            if ($thumb["name"] && $descript) {
+                $oldThumb = $database->selectCustom("WORK", ["THUMBNAIL.THUMB_LINK", "THUMBNAIL.THUMB_ID"], ["WORK_ID"], [$id], ["="], jTable: ["THUMBNAIL"], jColumn1: ["WORK.THUMB_ID"], jColumn2: ["THUMBNAIL.THUMB_ID"]); 
+
+                foreach ($oldThumb as $item) {
+                    $oldLink = $item["THUMB_LINK"]; 
+                    $oldId = $item["THUMB_ID"]; 
+                }
+
+                // Getting just the file name (no extension) 
+                $thumbName = pathinfo($thumb["name"], PATHINFO_FILENAME);
+
+                $uploadImg = $fileSystem->upload($thumb, "images"); 
+
+                if ($uploadImg) {
+                    $added = $database->insertValues("THUMBNAIL", ["THUMB_NAME", "THUMB_LINK", "THUMB_DESCRIPT"], [$thumbName, $uploadImg, $descript]); 
+
+                    if ($added) {
+                        // Getting id of new thumbnail item
+                        $ids = $database->selectCustom("THUMBNAIL", ["MAX(THUMB_ID) AS THUMB_ID"]); 
+
+                        foreach ($ids as $item) {
+                            $thumbId = $item["THUMB_ID"]; 
+                        }
+
+                        $updated = $database->updateValues("WORK", ["THUMB_ID"], [$thumbId], ["WORK_ID"], [$id], "AND"); 
+
+                        if ($updated) {
+                            echo "<p class='header-notif'>Successfully updated.</p>";
+                        } else {
+                            echo "<p class='header-notif'>Error with update.</p>"; 
+                        }
+
+                        $used = $database->checkUsed($oldId); 
+
+                        // If old thumbnail is not being used, remove
+                        if (!$used) {
+                            // Removing img from images/
+                            $fileSystem->delete($oldLink); 
+                            $removed = $database->deleteValues("THUMBNAIL", "THUMB_ID", $oldId); 
+
+                            if (!$removed) {
+                                echo "<p class='header-notif'>Error removing $oldLink from database.</p>";
+                            } 
+                        }
+                    }
+                }
+            }
         } 
     }
 ?>

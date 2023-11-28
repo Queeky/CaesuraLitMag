@@ -15,7 +15,7 @@
     
             $added = null; 
     
-            if ($name && $date && $thumb && $thumbDescript) {
+            if ($name && $date && $thumb["name"] && $thumbDescript) {
                 // Getting just the file name (no extension) 
                 $thumbName = pathinfo($thumb["name"], PATHINFO_FILENAME);
     
@@ -87,19 +87,27 @@
 
             $fileSystem->confirm(); 
         } else if (isset($_POST["yes"])) {
-            // Removing thumbnail from images/
-            $deleteImg = $fileSystem->delete($_SESSION["thumbLink"]); 
-    
-            if ($deleteImg) {
-                // Deleting all works associated with issue (change this!)
-                $database->deleteValues("WORK", "ISS_ID", $_SESSION["id"]);  
-                $database->deleteValues("ISSUE", "ISS_ID", $_SESSION["id"]); 
+            $used = $database->checkUsed($_SESSION["thumbId"]); 
+
+            // Deleting all works associated with issue
+            $database->deleteValues("WORK", "ISS_ID", $_SESSION["id"]);  
+            $removed = $database->deleteValues("ISSUE", "ISS_ID", $_SESSION["id"]); 
+
+            if ($removed) {
+                echo "<p class='header-notif'>$_SESSION[title] successfully removed.</p>";
+            } else {
+                echo "<p class='header-notif'>Error removing $_SESSION[title] from database.</p>"; 
+            }
+
+            if (!$used) {
+                // Removing thumbnail from images/
+                $fileSystem->delete($_SESSION["thumbLink"]); 
                 $removed = $database->deleteValues("THUMBNAIL", "THUMB_ID", $_SESSION["thumbId"]);
-    
+
                 if ($removed) {
-                    echo "<p class='header-notif'>$_SESSION[title] successfully removed.</p>";
+                    echo "<p class='header-notif'>$_SESSION[thumbLink] successfully removed.</p>";
                 } else {
-                    echo "<p class='header-notif'>Error removing $_SESSION[title] from database.</p>"; 
+                    echo "<p class='header-notif'>Error removing $_SESSION[thumbLink] from database.</p>"; 
                 }
             }
         } else if (isset($_POST["update"])) {
@@ -121,7 +129,7 @@
                 }
             }
 
-            if ($thumb && $thumbDescript) {
+            if ($thumb["name"] && $thumbDescript) {
                 $oldThumb = $database->selectCustom("ISSUE", ["THUMBNAIL.THUMB_LINK", "THUMBNAIL.THUMB_ID"], ["ISS_ID"], [$id], ["="], jTable: ["THUMBNAIL"], jColumn1: ["ISSUE.THUMB_ID"], jColumn2: ["THUMBNAIL.THUMB_ID"]); 
 
                 foreach ($oldThumb as $item) {
@@ -133,26 +141,27 @@
                 $thumbName = pathinfo($thumb["name"], PATHINFO_FILENAME);
 
                 $uploadImg = $fileSystem->upload($thumb, "images"); 
+                $added = $database->insertValues("THUMBNAIL", ["THUMB_NAME", "THUMB_LINK", "THUMB_DESCRIPT"], [$thumbName, $uploadImg, $thumbDescript]); 
 
-                if ($uploadImg) {
-                    $added = $database->insertValues("THUMBNAIL", ["THUMB_NAME", "THUMB_LINK", "THUMB_DESCRIPT"], [$thumbName, $uploadImg, $thumbDescript]); 
+                if ($added) {
+                    // Getting id of new thumbnail item
+                    $ids = $database->selectCustom("THUMBNAIL", ["MAX(THUMB_ID) AS THUMB_ID"]); 
 
-                    if ($added) {
-                        // Getting id of new thumbnail item
-                        $ids = $database->selectCustom("THUMBNAIL", ["MAX(THUMB_ID) AS THUMB_ID"]); 
+                    foreach ($ids as $item) {
+                        $thumbId = $item["THUMB_ID"]; 
+                    }
 
-                        foreach ($ids as $item) {
-                            $thumbId = $item["THUMB_ID"]; 
-                        }
+                    $updated = $database->updateValues("ISSUE", ["THUMB_ID"], [$thumbId], ["ISS_ID"], [$id], "AND"); 
 
-                        $updated = $database->updateValues("ISSUE", ["THUMB_ID"], [$thumbId], ["ISS_ID"], [$id], "AND"); 
+                    if ($updated) {
+                        echo "<p class='header-notif'>Successfully updated.</p>";
+                    } else {
+                        echo "<p class='header-notif'>Error with update.</p>"; 
+                    }
 
-                        if ($updated) {
-                            echo "<p class='header-notif'>Successfully updated.</p>";
-                        } else {
-                            echo "<p class='header-notif'>Error with update.</p>"; 
-                        }
+                    $used = $database->checkUsed($oldId); 
 
+                    if (!$used) {
                         // Removing img from images/
                         $deleteImg = $fileSystem->delete($oldLink); 
                         $removed = $database->deleteValues("THUMBNAIL", "THUMB_ID", $oldId); 

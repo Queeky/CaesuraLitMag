@@ -974,7 +974,7 @@ textarea.edit {
     height: 77vw !important;
 }
 
-.controls > input[type=text] {
+.controls input[type=text] {
     display: block; 
     width: 20vw; 
     height: 3vw; 
@@ -983,7 +983,7 @@ textarea.edit {
     border-radius: 0; 
 }
 
-.controls > input[placeholder] {
+.controls input[placeholder] {
     padding-left: 2vw; 
     color: grey; 
     font-size: 1.1vw; 

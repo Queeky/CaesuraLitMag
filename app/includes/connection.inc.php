@@ -165,6 +165,27 @@ class Database {
         }
     }
 
+    // Checks if image is being used by any other object
+    function checkUsed($id) {
+        $thumbs1 = $this->selectCustom("WORK", ["THUMB_ID"], ["THUMB_ID"], [$id], ["="]); 
+        $thumbs2 = $this->selectCustom("ISSUE", ["THUMB_ID"], ["THUMB_ID"], [$id], ["="]); 
+        $count = 0; 
+
+        foreach ($thumbs1 as $item) {
+            $count = $count + 1; 
+        }
+
+        foreach ($thumbs2 as $item) {
+            $count = $count + 1; 
+        }
+
+        if ($count > 1) {
+            return true; 
+        } else {
+            return false; 
+        }
+    }
+
     function selectCustom($table, $selected, $wColumn = [], $wValue = [], $wOperator = [], $wCond = "AND", $jTable = [], $jColumn1 = [], $jColumn2 = [], $order = null) {
         // Sanitizing input
         if ($wValue) {

@@ -138,11 +138,11 @@
         echo "</div>"; 
 
         echo "<div class='upload-input'>"; 
-        echo "<label for='doc'>UPLOAD DOCUMENT: ***</label>"; 
+        echo "<label for='doc'>UPLOAD DOCUMENT (SKIP THIS IF UPLOADING ARTWORK): ***</label>"; 
         echo "<input type='file' name='doc'>"; 
-        echo "<label for='doc'>UPLOAD THUMBNAIL: </label>"; 
+        echo "<label for='doc'>UPLOAD THUMBNAIL (ADD IMG FILE HERE IF ARTWORK): ***</label>"; 
         echo "<input type='file' name='thumb'>";  
-        echo "<input type='text' name='thumbDescript' placeholder='Enter thumbnail description'>";
+        echo "<input type='text' name='thumbDescript' placeholder='Enter thumbnail description ***'>";
         echo "</div>"; 
 
         echo "<button class='submit-btn' type='submit' name='add'>Submit</button>"; 
@@ -165,6 +165,7 @@
                 echo "<form action='archives.php' method='POST' enctype='multipart/form-data'>"; 
                 echo "<label for='thumb'>UPDATE THUMBNAIL: </label>"; 
                 echo "<input type='file' name='thumb'>";
+                echo "<input type='text' name='descript' placeholder='Enter thumbnail description'>"; 
                 echo "<div>"; 
                 echo "<button class='submit-btn' type='submit' name='update' value='$work[WORK_ID]'>Update</button>"; 
                 echo "<button class='submit-btn' type='submit' name='remove' value='$work[WORK_ID]'>Remove</button>"; 
