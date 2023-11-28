@@ -36,8 +36,6 @@
                 <?php 
                     include("includes/about.inc.php"); 
                 ?>
-                <img id='mll-lobby' src="images/MLLLobby.jpg" alt="">
-                <!-- Remember to add "Nothing's here" message during else statement -->
             </div>
             <?php 
                 include("includes/sidebar.inc.php"); 

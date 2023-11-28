@@ -11,6 +11,11 @@
         echo "<div class='footer-contact'>"; 
         echo "<a href='tel:7656772712'>(765) 677 2712</a>"; 
         echo "<a href='mailto:caesura@indwes.edu'>caesura@indwes.edu</a>"; 
+
+        if (isset($_SESSION["admName"])) {
+            echo "<a href='docs/user-manual.pdf' target='_blank'>user-manual.pdf</a>"; 
+        }
+
         echo "<button><a href='login.php'>Admin</a></button>"; 
         echo "</div>"; 
 

@@ -1,6 +1,6 @@
 <?php 
 
-$contacts = $database->selectCustom("CONTACT", ["*"], [], [], [], "AND", ["THUMBNAIL"], ["CONTACT.THUMB_ID"], ["THUMBNAIL.THUMB_ID"]); 
+$contacts = $database->selectCustom("CONTACT", ["*"], jTable: ["THUMBNAIL"], jColumn1: ["CONTACT.THUMB_ID"], jColumn2: ["THUMBNAIL.THUMB_ID"]); 
 
 // Displaying contacts as seen by user
 function displayContacts($contacts) {
@@ -19,7 +19,9 @@ function displayContacts($contacts) {
             echo "</div>"; 
         }
     } else {
-        echo "<p class='empty-message'>Nothing's here at the moment!</p>"; 
+        echo "<div class='empty-message large'>"; 
+        echo "<p>Nothing's here at the moment!</p>"; 
+        echo "</div>";
     }
 }
 
@@ -29,11 +31,11 @@ function displayForm($contacts) {
     echo "<form action='contacts.php' method='POST'>"; 
     echo "<h3>ADD NEW CONTACT:</h3>"; 
 
-    echo "<input type='text' name='title' placeholder='Title'>"; 
+    echo "<input type='text' name='title' placeholder='Title ***'>"; 
     echo "<input type='text' name='fname' placeholder='First Name'>"; 
     echo "<input type='text' name='lname' placeholder='Last Name'>"; 
-    echo "<input type='text' name='phone' placeholder='Phone'>"; 
-    echo "<input type='text' name='email' placeholder='Email'>"; 
+    echo "<input type='text' name='phone' placeholder='Phone ***'>"; 
+    echo "<input type='text' name='email' placeholder='Email ***'>"; 
     echo "<button class='submit-btn' type='submit' name='add'>Submit</button>"; 
 
     echo "</form>"; 
@@ -48,11 +50,11 @@ function displayForm($contacts) {
             echo "<div class='contact-info'>"; 
             echo "<form action='contacts.php' method='POST'>"; 
     
-            echo "<input type='text' name='title' value='$con[CONTACT_TITLE]' placeholder='Title'>"; 
+            echo "<input type='text' name='title' value='$con[CONTACT_TITLE]' placeholder='Title ***'>"; 
             echo "<input type='text' name='fname' value='$con[CONTACT_FNAME]' placeholder='First Name'>"; 
             echo "<input type='text' name='lname' value='$con[CONTACT_LNAME]' placeholder='Last Name'>"; 
-            echo "<input type='text' name='phone' value='$con[CONTACT_PHONE]' placeholder='Phone'>"; 
-            echo "<input type='text' name='email' value='$con[CONTACT_EMAIL]' placeholder='Email'>"; 
+            echo "<input type='text' name='phone' value='$con[CONTACT_PHONE]' placeholder='Phone ***'>"; 
+            echo "<input type='text' name='email' value='$con[CONTACT_EMAIL]' placeholder='Email ***'>"; 
     
             echo "<div class='controls'>"; 
             echo "<button class='submit-btn' type='submit' value='$con[CONTACT_ID]' name='update'>Update</button>"; 

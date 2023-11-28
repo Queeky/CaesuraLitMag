@@ -4,15 +4,21 @@ $works = $database->selectCustom("WORK", ["WORK.WORK_NAME", "WORK.WORK_CONTENT",
 
 function displayHighlight($works) {
     foreach ($works as $work) {
-        echo "<img class='highlight-img' src='images/$work[THUMB_LINK]' alt='$work[THUMB_DESCRIPT]'>"; 
+        // Decoding special chars
+        $content = htmlspecialchars_decode($work["WORK_CONTENT"]); 
+
+        echo "<img class='highlight-img' src='$work[THUMB_LINK]' alt='$work[THUMB_DESCRIPT]'>"; 
         echo "<div class='highlight-info'>";
         echo "<h3>$work[WORK_NAME]</h3>";  
         echo "<p>$work[CON_FNAME] $work[CON_LNAME]</p>"; 
         echo "</div>"; 
+        echo "<div class='linebreak'>"; 
         echo "<hr>"; 
+        echo "</div>"; 
 
         echo "<div class='highlight-content'>"; 
-        echo "<p>$work[WORK_CONTENT]</p>"; 
+        echo "<p>$content</p>"; 
+
         echo "</div>"; 
     }
 }

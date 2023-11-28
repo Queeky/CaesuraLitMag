@@ -1,6 +1,7 @@
 <?php 
     session_start(); 
     include("includes/connection.inc.php"); 
+    include("includes/files.inc.php"); 
 ?>
 <!DOCTYPE html>
 <html>
@@ -12,6 +13,33 @@
     </head>
     <body>
         <?php 
+            if (isset($_POST['email-submit'])) {
+                $email = $_POST['email-signup']; 
+
+                if ($email) {
+                    // Formatting data
+                    $email = strtolower($email); 
+
+                    // Checking if email already exists in database
+                    $check = $database->selectCustom("EMAIL", ["EMAIL_ID"], ["EMAIL_ADDRESS"], [$email], ["="]); 
+
+                    if (!$check) {
+                        $added = $database->insertValues("EMAIL", ["EMAIL_ADDRESS"], [$email]); 
+
+                        if ($added) {
+                            echo "<p class='header-notif'>$email successfully registered.</p>";
+                        } else {
+                            echo "<p class='header-notif'>Error registering $email.</p>"; 
+                        }
+                    } else {
+                        echo "<p class='header-notif'>$email is already registered.</p>"; 
+                    }
+                } else {
+                    echo "<p class='header-notif'>A field is missing information.</p>";
+                }
+            }
+
+
             $title = "CAESURA"; 
             include("includes/nav.inc.php"); 
         ?>

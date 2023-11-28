@@ -11,8 +11,14 @@ function displayGuidelines($guidelines) {
 
     echo "<ul class='guidelines'>"; 
 
-    foreach ($guidelines as $guide) {
-        echo "<li>$guide[GUIDE_DESCRIPT]</li>"; 
+    if ($guidelines) {
+        foreach ($guidelines as $guide) {
+            echo "<li>$guide[GUIDE_DESCRIPT]</li>"; 
+        }
+    } else {
+        echo "<div class='empty-message large'>"; 
+        echo "<p>Nothing's here at the moment!</p>"; 
+        echo "</div>";
     }
 
     echo "</ul>"; 
@@ -26,7 +32,7 @@ function displayForm($guidelines) {
     echo "<form action='submissions.php' method='POST'>"; 
     echo "<h3>ADD NEW GUIDELINE:</h3>"; 
 
-    echo "<input type='text' name='descript' placeholder='Enter new guideline here...'>"; 
+    echo "<textarea name='descript' placeholder='Enter new guideline here ***'></textarea>"; 
     echo "<button class='submit-btn' type='submit' name='add'>Submit</button>"; 
 
     echo "</form>"; 
@@ -34,15 +40,21 @@ function displayForm($guidelines) {
 
     echo "<div class='guidelines'>"; 
 
-    foreach ($guidelines as $guide) {
-        echo "<div class='guide-info'>"; 
-        echo "<form action='submissions.php' method='POST'>"; 
-        echo "<textarea name='descript'>$guide[GUIDE_DESCRIPT]</textarea>"; 
-
-        echo "<button class='submit-btn' type='submit' value='$guide[GUIDE_ID]' name='update'>Update</button>"; 
-        echo "<button class='submit-btn' type='submit' value='$guide[GUIDE_ID]' name='remove'>Remove</button>"; 
-        echo "</form>"; 
-        echo "</div>"; 
+    if ($guidelines) {
+        foreach ($guidelines as $guide) {
+            echo "<div class='guide-info'>"; 
+            echo "<form action='submissions.php' method='POST'>"; 
+            echo "<textarea name='descript'>$guide[GUIDE_DESCRIPT]</textarea>"; 
+    
+            echo "<button class='submit-btn' type='submit' value='$guide[GUIDE_ID]' name='update'>Update</button>"; 
+            echo "<button class='submit-btn' type='submit' value='$guide[GUIDE_ID]' name='remove'>Remove</button>"; 
+            echo "</form>"; 
+            echo "</div>"; 
+        }
+    } else {
+        echo "<div class='empty-message large'>"; 
+        echo "<p>Nothing's here at the moment!</p>"; 
+        echo "</div>";
     }
 
     echo "</div>"; 

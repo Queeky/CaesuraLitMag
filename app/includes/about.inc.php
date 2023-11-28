@@ -6,15 +6,18 @@ function displayDescript($database) {
     if ($descripts) {
         echo "<p class='about-page'>"; 
 
+        echo "<img id='mll-lobby' src='images/MLLLobby.jpg' alt='Image of the MLL lobby entrance.'>"; 
+
         foreach ($descripts as $item) {
-            echo "$item[ABOUT_DESCRIPT]"; 
+            $description = htmlspecialchars_decode($item["ABOUT_DESCRIPT"]);
+            echo $description; 
         }
 
         echo "</p>"; 
     } else {
-        echo "<p class='empty-message'>"; 
-        echo "Nothing's here right now!"; 
-        echo "</p>"; 
+        echo "<div class='empty-message large'>"; 
+        echo "<p>Nothing's here at the moment!</p>"; 
+        echo "</div>"; 
     }
 }
 
@@ -24,12 +27,10 @@ function displayForm($database) {
     echo "<form action='about.php' method='POST'>"; 
     echo "<textarea class='edit' name='descript'>"; 
 
-    // Set a var to hold all info (maybe)
-    // ALSO needs to be able to convert empty lines to <br><br>
-    // ALSO delete and upload pictures
-
     foreach ($descripts as $item) {
-        echo "$item[ABOUT_DESCRIPT]"; 
+        // $description = htmlspecialchars_decode($item["ABOUT_DESCRIPT"]); 
+        // $description = str_replace("&lt;br /&gt;", "\n", $item["ABOUT_DESCRIPT"]); 
+        echo $item["ABOUT_DESCRIPT"]; 
     }
 
     echo "</textarea>"; 

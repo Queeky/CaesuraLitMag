@@ -20,63 +20,41 @@
         <div class='page-wrap'>
             <div class='content-wrap float-left'>
                 <?php 
-                    $contributors = $database->selectCustom("CONTRIBUTOR", ["*"], [], [], [], "AND", [], [], [], "CON_LNAME"); 
+                    $database->cleanContributor();
+                    $contributors = $database->selectCustom("CONTRIBUTOR", ["*"],  order: "CON_LNAME"); 
 
-                    foreach ($contributors as $con) {
-                        echo "<div class='contributor-item'>"; 
-
-                        echo "<div class='contributor-info'>"; 
-                        echo "<p>$con[CON_LNAME], $con[CON_FNAME] </p>"; 
-                        
-                        // Checking if phone num is available
-                        // Maybe changing this so db holds "unavailable" if no 
-                        // phone or email (default value)
-                        if ($con["CON_PHONE"]) {
-                            echo "<a href='tel:$con[CON_PHONE]'>$con[CON_PHONE]</a>"; 
-                        } else {
-                            echo "<p>0000000000</p>"; 
+                    if ($contributors) {
+                        foreach ($contributors as $con) {
+                            echo "<div class='contributor-item'>"; 
+    
+                            echo "<div class='contributor-info'>"; 
+                            echo "<p>$con[CON_LNAME], $con[CON_FNAME] </p>"; 
+                            
+                            // Checking if phone num is available
+                            // Maybe changing this so db holds "unavailable" if no 
+                            // phone or email (default value)
+                            if ($con["CON_PHONE"]) {
+                                echo "<a href='tel:$con[CON_PHONE]'>$con[CON_PHONE]</a>"; 
+                            } else {
+                                echo "<p>0000000000</p>"; 
+                            }
+    
+                            // Checking if email is available
+                            if ($con["CON_EMAIL"]) {
+                                echo "<a href='mailto:$con[CON_EMAIL]'>$con[CON_EMAIL]</a>";
+                            } else {
+                                echo "<p>No available email</p>"; 
+                            }
+    
+                            echo "</div>"; 
+                            echo "</div>"; 
                         }
-
-                        // Checking if email is available
-                        if ($con["CON_EMAIL"]) {
-                            echo "<a href='mailto:$con[CON_EMAIL]'>$con[CON_EMAIL]</a>";
-                        } else {
-                            echo "<p>No available email</p>"; 
-                        }
-
-                        echo "</div>"; 
+                    } else {
+                        echo "<div class='empty-message large'>"; 
+                        echo "<p>Nothing's here at the moment!</p>"; 
                         echo "</div>"; 
                     }
                 ?>
-
-
-                <!-- <div class='contributor-item'>
-                    <img src="#" alt="">
-                    <div class='contributor-info'>
-                        <p>Computer Information Systems</p>
-                        <p>Quinn Miersma</p>
-                        <a href="tel:2222222222">(222) 222 2222</a>
-                        <a href="mailto:sneakyqueeky@outlook.com">sneakyqueeky@outlook.com</a>
-                    </div>
-                </div>
-                <div class='contributor-item'>
-                    <img src="#" alt="">
-                    <div class='contributor-info'>
-                        <p>Computer Information Systems</p>
-                        <p>Quinn Miersma</p>
-                        <a href="tel:2222222222">(222) 222 2222</a>
-                        <a href="mailto:sneakyqueeky@outlook.com">sneakyqueeky@outlook.com</a>
-                    </div>
-                </div>
-                <div class='contributor-item'>
-                    <img src="#" alt="">
-                    <div class='contributor-info'>
-                        <p>Computer Information Systems</p>
-                        <p>Quinn Miersma</p>
-                        <a href="tel:2222222222">(222) 222 2222</a>
-                        <a href="mailto:sneakyqueeky@outlook.com">sneakyqueeky@outlook.com</a>
-                    </div>
-                </div> -->
             </div>
             <?php 
                 include("includes/sidebar.inc.php"); 

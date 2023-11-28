@@ -3,36 +3,16 @@
 class FileSystem {
 
     // Confirming the deletion of an object
-    function confirm($type, $name) {
-        $input = null; 
-
-        echo "<script>"; 
-
-        echo "var msg = null;"; 
-
-        switch ($type) {
-            case "issue": 
-                echo "msg = 'Deleting $name will also remove all works within this issue. Do you want to continue? (Y/N)';"; 
-                break; 
-            case "media": 
-                echo "msg = 'Deleting $name will also remove all works of this media type. Do you want to continue? (Y/N)';"; 
-                break; 
-            case "work": 
-                echo "var msg = '$name will be deleted. Do you want to continue? (Y/N)';"; 
-                break; 
-        }
-
-        echo "var input = prompt(msg);"; 
-        echo "</script>"; 
-
-        $input = "<script>document.write(input);</script>"; 
-
-        return $input; 
+    function confirm() {
+        header("Location: confirm.php"); 
+        die(); 
     }
 
     // Deleting a file
-    function delete($file, $type) {
-        if (unlink("$type/" . $file)) {
+    function delete($file) {
+        $file = htmlspecialchars_decode($file); 
+
+        if (unlink($file)) {
             echo "<p class='header-notif'>$file successfully deleted.</p>";
 
             return true; 
@@ -44,14 +24,21 @@ class FileSystem {
     }
 
     // Uploading a file
-    function upload($database, $file, $type) {
+    function upload($file, $type) {
         if ($type != "docs" && $type != "images") {
             return null; 
         }
 
-        $newFile = "$type/". basename($file["name"]);
         $uploadOk = 1;
-        $fileType = strtolower(pathinfo($newFile, PATHINFO_EXTENSION));
+        $fileType = strtolower(pathinfo(basename($file["name"]), PATHINFO_EXTENSION));
+        $uniqName = uniqid(); 
+        $newFile = "$type/$uniqName.$fileType"; 
+
+        // Regenerating uniqid if already exists as file name
+        while (file_exists($newFile)) {
+            $uniqName = uniqid(); 
+            $newFile = "$type/$uniqName.$fileType"; 
+        }
 
         // Checking the file type
         switch($type) {
@@ -63,24 +50,13 @@ class FileSystem {
                 break; 
         }
 
-        // Checking if file already exists
-        // NOTE: if exists, make so that it uses existing file?
-        if (file_exists($newFile)) {
-            if ($type == "images") {
-                $database->insertValues
-            } else {
-                echo "<p class='header-notif'>A file with this name and type already exists.</p>";
-                $uploadOk = 0;
-            }
-        }
-
         if ($uploadOk == 0) {
             echo "<p class='header-notif'>Your file was not able to upload.</p>";
         } else {
             if (move_uploaded_file($file["tmp_name"], $newFile)) {
                 echo "<p class='header-notif'>$file[name] successfully uploaded.</p>";
 
-                return true; 
+                return $newFile; 
             } else {
                 echo "<p class='header-notif'>$file[name] was unable to upload.</p>";
             }
@@ -91,7 +67,7 @@ class FileSystem {
 
     // Checking if doc fits accepted file types
     function checkDoc($fileType, $uploadOk) {
-        if ($fileType != "doc" && $fileType != "docx" && $fileType != "txt") {
+        if ($fileType != "doc" && $fileType != "docx" && $fileType != "txt" && $fileType != "jpg" && $fileType != "jpeg" && $fileType != "png" && $fileType != "gif") {
             echo "<p class='header-notif'>Cannot accept file type $fileType.</p>";
             $uploadOk = 0; 
         }

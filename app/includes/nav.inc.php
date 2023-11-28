@@ -3,30 +3,23 @@
 $results = $database->selectCustom("MEDIA_TYPE", ["*"]); 
 
 function displayAdmin() {
-    if (isset($_SESSION["admName"])) {
-        echo "<div class='admin-bar'>"; 
+    echo "<div class='admin-bar'>"; 
 
-        echo "<p>Welcome back, $_SESSION[admName]</p>"; 
-        echo "<div class='buttons'>"; 
-        echo "<div>"; 
-        echo "<button><a href='about.php'>Update About</a></button>"; 
-        echo "<button><a href='contacts.php'>Update Contacts</a></button>"; 
-        echo "<button><a href='submissions.php'>Update Guidelines</a></button>"; 
-        echo "</div>"; 
-        echo "<div>"; 
-        echo "<button><a href='mediaAdd.php'>Add Media</a></button>"; 
-        echo "<button><a href='issueAdd.php'>Add Issues</a></button>"; 
-        echo "<button><a href='workAdd.php'>Add Works</a></button>"; 
-        echo "</div>"; 
-        echo "<div>"; 
-        echo "<button><a href='mediaRemove.php'>Remove Media</a></button>"; 
-        echo "<button><a href='issueRemove.php'>Remove Issues</a></button>"; 
-        echo "<button><a href='workRemove.php'>Remove Works</a></button>"; 
-        echo "</div>"; 
-        echo "</div>"; 
+    echo "<p>Welcome back, $_SESSION[admName]</p>"; 
+    echo "<div class='buttons'>"; 
+    echo "<div>"; 
+    echo "<button><a href='about.php'>Update About</a></button>"; 
+    echo "<button><a href='contacts.php'>Update Contacts</a></button>"; 
+    echo "<button><a href='submissions.php'>Update Guidelines</a></button>"; 
+    echo "</div>"; 
+    echo "<div>"; 
+    echo "<button><a href='media.php'>Update Media</a></button>"; 
+    echo "<button><a href='issues.php'>Update Issues</a></button>"; 
+    echo "<button><a href='archives.php'>Update Works</a></button>"; 
+    echo "</div>"; 
+    echo "</div>"; 
 
-        echo "</div>"; 
-    }
+    echo "</div>"; 
 }
 
 function displayHeader($title) {
@@ -98,7 +91,9 @@ function displayNav($results) {
     echo "</nav>"; 
 }
 
-displayAdmin(); 
+if (isset($_SESSION["admName"])) {
+    displayAdmin(); 
+}
 displayHeader($title); 
 displayNav($results); 
 ?>
