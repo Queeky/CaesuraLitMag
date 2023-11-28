@@ -20,6 +20,7 @@
         <div class='page-wrap'>
             <div class='content-wrap float-left'>
                 <?php 
+                    $database->cleanContributor();
                     $contributors = $database->selectCustom("CONTRIBUTOR", ["*"],  order: "CON_LNAME"); 
 
                     if ($contributors) {

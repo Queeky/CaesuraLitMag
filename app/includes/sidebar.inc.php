@@ -2,6 +2,7 @@
     function displaySidebar($database) {
         echo "<div class='sidebar'>"; 
 
+        // Search bar
         echo "<form action='archives.php' method='GET'>"; 
         echo "<label for='query'>SEARCH WORKS</label>";
         echo "<div>";  
@@ -10,6 +11,16 @@
         echo "</div>"; 
         echo "</form>"; 
 
+        // Email Signup
+        echo "<form action='index.php' method='POST'>"; 
+        echo "<label for='email-signup'>EMAIL SIGNUP</label>";
+        echo "<div>";  
+        echo "<input class='email-signup' type='text' name='email-signup' placeholder='Enter your email'>";
+        echo "<button type='submit' name='email-submit'><img src='images/EmailIcon.png'></button>";   
+        echo "</div>"; 
+        echo "</form>"; 
+
+        // Contacts
         echo "<div class='contact'>"; 
         echo "<label for='#'>CONTACT</label>"; 
         echo "<a href='tel: 7656772712'>(765) 677 2712</a>"; 
@@ -17,6 +28,7 @@
         echo "<a href='mailto: eng.office@indwes.edu'>eng.office@indwes.edu</a>"; 
         echo "</div>"; 
 
+        // Past Issues
         echo "<div class='issues'>"; 
         echo "<label for='#'>PAST ISSUES</label>"; 
         echo "<ul>"; 

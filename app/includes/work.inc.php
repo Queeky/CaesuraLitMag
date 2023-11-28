@@ -7,7 +7,7 @@ function displayHighlight($works) {
         // Decoding special chars
         $content = htmlspecialchars_decode($work["WORK_CONTENT"]); 
 
-        echo "<img class='highlight-img' src='images/$work[THUMB_LINK]' alt='$work[THUMB_DESCRIPT]'>"; 
+        echo "<img class='highlight-img' src='$work[THUMB_LINK]' alt='$work[THUMB_DESCRIPT]'>"; 
         echo "<div class='highlight-info'>";
         echo "<h3>$work[WORK_NAME]</h3>";  
         echo "<p>$work[CON_FNAME] $work[CON_LNAME]</p>"; 

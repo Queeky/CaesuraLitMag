@@ -32,7 +32,7 @@ function displayForm($guidelines) {
     echo "<form action='submissions.php' method='POST'>"; 
     echo "<h3>ADD NEW GUIDELINE:</h3>"; 
 
-    echo "<input type='text' name='descript' placeholder='Enter new guideline here...'>"; 
+    echo "<textarea name='descript' placeholder='Enter new guideline here ***'></textarea>"; 
     echo "<button class='submit-btn' type='submit' name='add'>Submit</button>"; 
 
     echo "</form>"; 

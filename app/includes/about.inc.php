@@ -6,6 +6,8 @@ function displayDescript($database) {
     if ($descripts) {
         echo "<p class='about-page'>"; 
 
+        echo "<img id='mll-lobby' src='images/MLLLobby.jpg' alt='Image of the MLL lobby entrance.'>"; 
+
         foreach ($descripts as $item) {
             $description = htmlspecialchars_decode($item["ABOUT_DESCRIPT"]);
             echo $description; 
@@ -24,9 +26,6 @@ function displayForm($database) {
 
     echo "<form action='about.php' method='POST'>"; 
     echo "<textarea class='edit' name='descript'>"; 
-
-    // ALSO needs to be able to convert empty lines to <br><br>
-    // ALSO delete and upload pictures
 
     foreach ($descripts as $item) {
         // $description = htmlspecialchars_decode($item["ABOUT_DESCRIPT"]); 

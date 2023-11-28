@@ -116,9 +116,22 @@ class Database {
         }
     }
 
+    // Runs through contributors and makes sure each person has at least 
+    // one work to their name; if not, contributor removed
+    function cleanContributor() {
+        $conIds = $this->selectCustom("CONTRIBUTOR", ["CON_ID"]); 
+
+        foreach ($conIds as $id) {
+            $work = $this->selectCustom("WORK", ["WORK_ID"], ["CON_ID"], [$id["CON_ID"]], ["="]); 
+
+            if (!$work) {
+                $this->deleteValues("CONTRIBUTOR", "CON_ID", $id["CON_ID"]); 
+            }
+        }
+    }
+
     // Checks if contributor already exists
     // If true, returns id; if false, creates new contributor
-    // NOTE: if no works contain contributor, remove from db
     function checkContributor($fName, $lName) {
         // Sanitizing input
         $names = $this->sanitize([$fName, $lName]); 
@@ -154,7 +167,9 @@ class Database {
 
     function selectCustom($table, $selected, $wColumn = [], $wValue = [], $wOperator = [], $wCond = "AND", $jTable = [], $jColumn1 = [], $jColumn2 = [], $order = null) {
         // Sanitizing input
-        $wValue = $this->sanitize($wValue); 
+        if ($wValue) {
+            $wValue = $this->sanitize($wValue); 
+        }
 
         // Checking if selectCustom will successfully run
         if (count($wValue) != count($wColumn) || count($wOperator) != count($wColumn)) {

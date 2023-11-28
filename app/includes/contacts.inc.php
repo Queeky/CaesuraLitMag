@@ -31,11 +31,11 @@ function displayForm($contacts) {
     echo "<form action='contacts.php' method='POST'>"; 
     echo "<h3>ADD NEW CONTACT:</h3>"; 
 
-    echo "<input type='text' name='title' placeholder='Title'>"; 
+    echo "<input type='text' name='title' placeholder='Title ***'>"; 
     echo "<input type='text' name='fname' placeholder='First Name'>"; 
     echo "<input type='text' name='lname' placeholder='Last Name'>"; 
-    echo "<input type='text' name='phone' placeholder='Phone'>"; 
-    echo "<input type='text' name='email' placeholder='Email'>"; 
+    echo "<input type='text' name='phone' placeholder='Phone ***'>"; 
+    echo "<input type='text' name='email' placeholder='Email ***'>"; 
     echo "<button class='submit-btn' type='submit' name='add'>Submit</button>"; 
 
     echo "</form>"; 
@@ -50,11 +50,11 @@ function displayForm($contacts) {
             echo "<div class='contact-info'>"; 
             echo "<form action='contacts.php' method='POST'>"; 
     
-            echo "<input type='text' name='title' value='$con[CONTACT_TITLE]' placeholder='Title'>"; 
+            echo "<input type='text' name='title' value='$con[CONTACT_TITLE]' placeholder='Title ***'>"; 
             echo "<input type='text' name='fname' value='$con[CONTACT_FNAME]' placeholder='First Name'>"; 
             echo "<input type='text' name='lname' value='$con[CONTACT_LNAME]' placeholder='Last Name'>"; 
-            echo "<input type='text' name='phone' value='$con[CONTACT_PHONE]' placeholder='Phone'>"; 
-            echo "<input type='text' name='email' value='$con[CONTACT_EMAIL]' placeholder='Email'>"; 
+            echo "<input type='text' name='phone' value='$con[CONTACT_PHONE]' placeholder='Phone ***'>"; 
+            echo "<input type='text' name='email' value='$con[CONTACT_EMAIL]' placeholder='Email ***'>"; 
     
             echo "<div class='controls'>"; 
             echo "<button class='submit-btn' type='submit' value='$con[CONTACT_ID]' name='update'>Update</button>"; 
