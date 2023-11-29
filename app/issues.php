@@ -21,6 +21,8 @@
     
                 // Formatting data
                 $name = strtoupper($name);
+
+                $descript = nl2br($descript); 
     
                 // Uploading file images/
                 $uploadImg = $fileSystem->upload($thumb, "images");
@@ -151,6 +153,8 @@
                         $thumbId = $item["THUMB_ID"]; 
                     }
 
+                    $used = $database->checkUsed($oldId); 
+
                     $updated = $database->updateValues("ISSUE", ["THUMB_ID"], [$thumbId], ["ISS_ID"], [$id], "AND"); 
 
                     if ($updated) {
@@ -158,8 +162,6 @@
                     } else {
                         echo "<p class='header-notif'>Error with update.</p>"; 
                     }
-
-                    $used = $database->checkUsed($oldId); 
 
                     if (!$used) {
                         // Removing img from images/

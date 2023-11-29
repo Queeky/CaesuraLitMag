@@ -6,13 +6,18 @@
     if (isset($_POST["loginSubmit"])) {
         $name = $_POST["admName"];
         $pass = $_POST["admPass"]; 
+        $realPass = null; 
 
-        // SCAN FOR SQL INJECTION
+        $pass = md5($pass); 
 
         if (!empty($name) && !empty($pass)) {
-            $result = $database->selectCustom("ADMIN", ["ADM_ID"], ["ADM_NAME", "ADM_PASS"], ["$_POST[admName]", "$_POST[admPass]"], ["=", "="], "AND"); 
+            $result = $database->selectCustom("ADMIN", ["ADM_PASS"], ["ADM_NAME"], [$name], ["="]); 
 
-            if ($result != null) {
+            foreach ($result as $item) {
+                $realPass = $item["ADM_PASS"]; 
+            }
+
+            if ($pass == $realPass) {
                 $_SESSION["admName"] = $name; 
                 echo "<meta http-equiv='refresh' content='0; URL=index.php'>"; 
             } else {

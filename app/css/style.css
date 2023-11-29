@@ -463,7 +463,15 @@ footer {
     height: 45vw; 
     background-color: var(--iss4Primary); 
     float: left; 
+    /* overflow-y: auto; 
+    overflow-x: hidden;  */
     /* box-shadow: 2vw 4vh #545454;  */
+}
+
+.issue-descript {
+    height: 10vw; 
+    overflow-y: auto; 
+    overflow-x: hidden; 
 }
 
 .issue-label > h1 {
@@ -601,6 +609,22 @@ footer {
 
 .grid > .archive-item > div > p:last-child {
     margin-top: 0.2vw; 
+    font-size: 1.2vw; 
+    font-family: 'Tahoma', 'Verdana', monospace, sans-serif;
+}
+
+/* Contributor Page */
+
+.contributor-item {
+    margin-top: 1vw; 
+    margin-bottom: 1vw; 
+    padding-top: 1vw; 
+    padding-bottom: 1vw; 
+    background-color: #F8F8F8; 
+}
+
+.contributor-item p {
+    margin-left: 2vw; 
     font-size: 1.2vw; 
     font-family: 'Tahoma', 'Verdana', monospace, sans-serif;
 }

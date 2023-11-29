@@ -2,6 +2,8 @@
     function displayIssue($results) {
         if ($results) {
             foreach ($results as $issue) {
+                $issueDescript = htmlspecialchars_decode($issue["ISS_DESCRIPT"]); 
+
                 echo "<div class='issue'>"; 
 
                 echo "<div class='issue-label'>"; 
@@ -16,7 +18,7 @@
                 // Eventually make the description a link, too; 
                 // Leads to where?
                 echo "<div class='issue-descript'>"; 
-                echo "<p>$issue[ISS_DESCRIPT]</p>"; 
+                echo "<p>$issueDescript</p>"; 
                 echo "</div>"; 
 
                 echo "</div>"; 
@@ -70,6 +72,9 @@
 
         if ($results) {
             foreach ($results as $issue) {
+                $issueDescript = htmlspecialchars_decode($issue["ISS_DESCRIPT"]); 
+                $issueDescript = str_replace("<br />", "\n", $issueDescript); 
+
                 echo "<div class='issue issue-form'>"; 
                 echo "<form action='issues.php' method='POST' enctype='multipart/form-data'>"; 
 
@@ -84,7 +89,7 @@
 
                 // Showing remove and update buttons
                 echo "<div class='controls'>"; 
-                echo "<textarea name='descript'>$issue[ISS_DESCRIPT]</textarea>"; 
+                echo "<textarea name='descript'>$issueDescript</textarea>"; 
                 echo "<label for='thumb'>UPDATE THUMBNAIL: </label>"; 
                 echo "<input type='file' name='thumb'>"; 
                 echo "<input type='text' name='thumbDescript' placeholder='Enter thumbnail description'>"; 

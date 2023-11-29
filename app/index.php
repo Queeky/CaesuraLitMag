@@ -17,14 +17,18 @@
                 $email = $_POST['email-signup']; 
 
                 if ($email) {
-                    // Formatting data
-                    $email = strtolower($email); 
+                    $check = null; 
+                    $results = $database->selectCustom("EMAIL", ["*"]); 
 
                     // Checking if email already exists in database
-                    $check = $database->selectCustom("EMAIL", ["EMAIL_ID"], ["EMAIL_ADDRESS"], [$email], ["="]); 
+                    foreach ($results as $item) {
+                        if ($item["EMAIL_ADDRESS"] == md5($email)) {
+                            $check = true; 
+                        }
+                    }
 
                     if (!$check) {
-                        $added = $database->insertValues("EMAIL", ["EMAIL_ADDRESS"], [$email]); 
+                        $added = $database->insertValues("EMAIL", ["EMAIL_ADDRESS"], [md5($email)]); 
 
                         if ($added) {
                             echo "<p class='header-notif'>$email successfully registered.</p>";

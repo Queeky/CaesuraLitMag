@@ -28,9 +28,11 @@ function displayForm($database) {
     echo "<textarea class='edit' name='descript'>"; 
 
     foreach ($descripts as $item) {
-        // $description = htmlspecialchars_decode($item["ABOUT_DESCRIPT"]); 
+        $description = htmlspecialchars_decode($item["ABOUT_DESCRIPT"]); 
+        // $description = str_replace("<br />", "\n", $description);
         // $description = str_replace("&lt;br /&gt;", "\n", $item["ABOUT_DESCRIPT"]); 
-        echo $item["ABOUT_DESCRIPT"]; 
+        // echo $item["ABOUT_DESCRIPT"]; 
+        echo $description; 
     }
 
     echo "</textarea>"; 

@@ -1,6 +1,6 @@
 <?php 
 
-$contacts = $database->selectCustom("CONTACT", ["*"], jTable: ["THUMBNAIL"], jColumn1: ["CONTACT.THUMB_ID"], jColumn2: ["THUMBNAIL.THUMB_ID"]); 
+$contacts = $database->selectCustom("CONTACT", ["*"], jTable: ["THUMBNAIL"], jColumn1: ["CONTACT.THUMB_ID"], jColumn2: ["THUMBNAIL.THUMB_ID"], order: "CONTACT_ID", orderType: "ASC"); 
 
 // Displaying contacts as seen by user
 function displayContacts($contacts) {
@@ -12,8 +12,8 @@ function displayContacts($contacts) {
             echo "<div class='contact-info'>"; 
             echo "<p>$con[CONTACT_TITLE]</p>"; 
             echo "<p>$con[CONTACT_FNAME] $con[CONTACT_LNAME]</p>"; 
-            echo "<a href='tel:$con[CONTACT_PHONE]'>$con[CONTACT_PHONE]</a>"; 
-            echo "<a href='mailto:$con[CONTACT_EMAIL]'>$con[CONTACT_EMAIL]</a>";
+            echo "<a href='tel:$con[CONTACT_PHONE]'>PHONE: $con[CONTACT_PHONE]</a>"; 
+            echo "<a href='mailto:$con[CONTACT_EMAIL]'>EMAIL: $con[CONTACT_EMAIL]</a>";
             echo "</div>"; 
     
             echo "</div>"; 
@@ -34,7 +34,7 @@ function displayForm($contacts) {
     echo "<input type='text' name='title' placeholder='Title ***'>"; 
     echo "<input type='text' name='fname' placeholder='First Name'>"; 
     echo "<input type='text' name='lname' placeholder='Last Name'>"; 
-    echo "<input type='text' name='phone' placeholder='Phone ***'>"; 
+    echo "<input type='text' name='phone' placeholder='Phone'>"; 
     echo "<input type='text' name='email' placeholder='Email ***'>"; 
     echo "<button class='submit-btn' type='submit' name='add'>Submit</button>"; 
 

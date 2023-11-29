@@ -176,7 +176,6 @@
 
             $fileSystem->confirm(); 
         } else if (isset($_POST["yes"])) {
-            // Removing thumbnail from images/ and doc from docs/
             $used = $database->checkUsed($_SESSION["thumbId"]); 
 
             if (isset($_SESSION["docLink"])) {
@@ -227,6 +226,8 @@
                             $thumbId = $item["THUMB_ID"]; 
                         }
 
+                        $used = $database->checkUsed($oldId); 
+
                         $updated = $database->updateValues("WORK", ["THUMB_ID"], [$thumbId], ["WORK_ID"], [$id], "AND"); 
 
                         if ($updated) {
@@ -234,8 +235,6 @@
                         } else {
                             echo "<p class='header-notif'>Error with update.</p>"; 
                         }
-
-                        $used = $database->checkUsed($oldId); 
 
                         // If old thumbnail is not being used, remove
                         if (!$used) {
