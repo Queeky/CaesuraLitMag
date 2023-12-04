@@ -291,7 +291,7 @@ class Database {
             $title = $this->selectCustom("WORK", ["WORK_ID", "WORK_NAME"], ["WORK_NAME"], [$keyword], ["="]); 
             $fName = $this->selectCustom("CONTRIBUTOR", ["CON_ID", "CON_FNAME"], ["CON_FNAME"], [$keyword], ["="]); 
             $lName = $this->selectCustom("CONTRIBUTOR", ["CON_ID", "CON_LNAME"], ["CON_LNAME"], [$keyword], ["="]); 
-            $issue = $this->selectCustom("ISSUE", ["ISS_ID", "ISS_NAME"], ["ISS_NAME"], [$keyword], ["="]); 
+            $issue = $this->selectCustom("ISSUE", ["ISS_ID", "ISS_NAME"], ["ISS_NAME"], [$keyword], ["like"]); 
             $media = $this->selectCustom("MEDIA_TYPE", ["MEDIA_ID", "MEDIA_NAME"], ["MEDIA_NAME"], [$keyword], ["="]); 
             $date = $this->selectCustom("ISSUE", ["ISS_ID", "YEAR(ISS_DATE) AS ISS_DATE"], ["YEAR(ISS_DATE)"], [$keyword], ["="]); 
             $keyword = $this->selectCustom("WORK", ["WORK_ID"], ["WORK_CONTENT"], [$keyword], ["like"]); 
@@ -385,21 +385,31 @@ class Database {
 
             foreach ($ids as $id) {
                 if ($count > 0) {
-                    $sql .= "OR "; 
+                    $sql .= "AND "; 
                 }
 
                 $sql .= "$key = $id "; 
 
-                foreach ($allIds as $key2 => $ids2) {
-                    if ($key2 != $key) {
-                        foreach ($ids2 as $id2) {
-                            $sql .= "AND $key2 = $id2 "; 
-                        }
-                    }
-                }
-
                 $count++; 
             }
+
+            // foreach ($ids as $id) {
+            //     if ($count > 0) {
+            //         $sql .= "OR "; 
+            //     }
+
+            //     $sql .= "$key = $id "; 
+
+            //     foreach ($allIds as $key2 => $ids2) {
+            //         if ($key2 != $key) {
+            //             foreach ($ids2 as $id2) {
+            //                 $sql .= "AND $key2 = $id2 "; 
+            //             }
+            //         }
+            //     }
+
+            //     $count++; 
+            // }
         }
 
         $sql .= "UNION "; 

@@ -3,9 +3,13 @@
 
     include("includes/connection.inc.php"); 
     include("includes/files.inc.php"); 
+    include("includes/mail.inc.php"); 
 
-    function readAction($database, $fileSystem) {
+    function readAction($database, $fileSystem, $mail) {
         if (isset($_POST["add"])) {
+            // Establishing SMTP connection
+            setupMailer($mail); 
+
             $name = $_POST["name"]; 
             $date = $_POST["date"]; 
             $descript = $_POST["descript"]; 
@@ -46,16 +50,21 @@
     
                     if ($added) {
                         echo "<p class='header-notif'>$name successfully added.</p>";
+
+                        $mail->isHTML(true); 
+                        $mail->Subject = "NEW ISSUE: " . strtoupper($name); 
+                        $mail->Body = "A new issue -- $name -- has been added to Caesura Magazine!" . "<br />" . "Check it out by visiting caesuralitmag.com" . "<br /><br />" . "Here's a sneak peek:" . "<br />" . mb_strimwidth($descript, 0, 150, "..."); 
+                        $mail->AltBody = "A new issue -- $name -- has been added to Caesura Magazine!" . "\n" . "Check it out by visiting caesuralitmag.com" . "\n\n" . "Here's a sneak peek:" . "\n" . mb_strimwidth($descript, 0, 150, "...");
     
-                        // $msg = "A new issue has been added to Caesura Magazine!\n\n
-                        //         Check it out by visiting caesuralitmag.com"; 
-                        // $msg = wordwrap($msg, 70); 
+                        $emails = $database->selectCustom("EMAIL", ["*"]); 
     
-                        // $emails = $database->selectCustom("EMAIL", ["*"]); 
-    
-                        // foreach ($emails as $email) {
-                        //     mail($email["EMAIL_ADDRESS"], "NEW ISSUE: " . strtoupper($name), $msg); 
-                        // }
+                        foreach ($emails as $email) {
+                            // mail($email["EMAIL_ADDRESS"], "NEW ISSUE: " . strtoupper($name), $msg); 
+                            $mail->addAddress($email["EMAIL_ADDRESS"]); 
+                        }
+
+                        // Sending the email notifs
+                        $mail->send(); 
                     } else {
                         echo "<p class='header-notif'>Error pushing $name to database.</p>"; 
                     }
@@ -122,6 +131,23 @@
             $oldId = null; 
 
             if ($descript) {
+                // Transforming newline chars to break tags
+                $descript = nl2br($descript);
+
+                $descriptArray = explode("<br />", $descript); 
+                $descript = ""; 
+                $count = count($descriptArray); 
+
+                // Removing extra spaces
+                for ($i = 0; $i < $count; $i++) {
+                    if (strlen($descriptArray[$i]) < 2) {
+                        unset($descriptArray[$i]); 
+                    } else {
+                        $descript = $descript . $descriptArray[$i] . "<br />"; 
+                    }
+                }
+
+
                 $updated = $database->updateValues("ISSUE", ["ISS_DESCRIPT"], [$descript], ["ISS_ID"], [$id]); 
 
                 if ($updated) {
@@ -188,7 +214,7 @@
     </head>
     <body>
         <?php 
-            readAction($database, $fileSystem); 
+            readAction($database, $fileSystem, $mail); 
 
             $title = "ISSUES"; 
             include("includes/nav.inc.php"); 

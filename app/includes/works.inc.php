@@ -64,8 +64,8 @@
     // Use switch statement to choose between searchKeys
     switch($searchKey) {
         case "query": 
-            $works = $database->selectSearch($allIds);
-            // $works = $database->selectSearch2($queryArray); 
+            // $works = $database->selectSearch($allIds);
+            $works = $database->selectSearch2($queryArray); 
             break; 
         case "issue": 
             $works = $database->selectCustom("WORK", ["WORK.WORK_ID", "WORK.WORK_NAME", "THUMBNAIL.THUMB_LINK", "THUMBNAIL.THUMB_DESCRIPT", "ISSUE.ISS_NAME", "ISSUE.ISS_DATE", "CONTRIBUTOR.CON_FNAME", "CONTRIBUTOR.CON_LNAME"], ["ISSUE.ISS_ID"], [$issue], ["="], "OR", ["THUMBNAIL", "ISSUE", "CONTRIBUTOR"], ["WORK.THUMB_ID", "WORK.ISS_ID", "WORK.CON_ID"], ["THUMBNAIL.THUMB_ID", "ISSUE.ISS_ID", "CONTRIBUTOR.CON_ID"], "WORK.WORK_ID", "DESC");

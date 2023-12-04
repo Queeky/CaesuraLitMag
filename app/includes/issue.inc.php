@@ -73,7 +73,7 @@
         if ($results) {
             foreach ($results as $issue) {
                 $issueDescript = htmlspecialchars_decode($issue["ISS_DESCRIPT"]); 
-                $issueDescript = str_replace("<br />", "\n", $issueDescript); 
+                $issueDescript = str_replace("<br />", "", $issueDescript); 
 
                 echo "<div class='issue issue-form'>"; 
                 echo "<form action='issues.php' method='POST' enctype='multipart/form-data'>"; 
