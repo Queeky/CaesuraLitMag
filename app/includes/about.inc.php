@@ -22,20 +22,21 @@ function displayDescript($database) {
 }
 
 function displayForm($database) {
-    $descripts = $database->selectCustom("ABOUT", ["ABOUT_DESCRIPT"]);
+    $descripts = $database->selectCustom("ABOUT", ["*"]);
 
     echo "<form action='about.php' method='POST'>"; 
     echo "<textarea class='edit' name='descript'>"; 
 
     foreach ($descripts as $item) {
-        // $description = htmlspecialchars_decode($item["ABOUT_DESCRIPT"]); 
-        // $description = str_replace("&lt;br /&gt;", "\n", $item["ABOUT_DESCRIPT"]); 
-        echo $item["ABOUT_DESCRIPT"]; 
+        $descript = htmlspecialchars_decode($item["ABOUT_DESCRIPT"]);
+        $descript = str_replace("<br />", "", $descript); 
+
+        echo $descript; 
     }
 
     echo "</textarea>"; 
 
-    echo "<button class='submit-btn' type='submit' name='update'>Update</button>"; 
+    echo "<button class='submit-btn' type='submit' name='update' value=$item[ABOUT_ID]>Update</button>"; 
     echo "</form>"; 
 
 }

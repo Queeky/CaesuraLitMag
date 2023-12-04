@@ -26,27 +26,7 @@
                     if ($contributors) {
                         foreach ($contributors as $con) {
                             echo "<div class='contributor-item'>"; 
-    
-                            echo "<div class='contributor-info'>"; 
                             echo "<p>$con[CON_LNAME], $con[CON_FNAME] </p>"; 
-                            
-                            // Checking if phone num is available
-                            // Maybe changing this so db holds "unavailable" if no 
-                            // phone or email (default value)
-                            if ($con["CON_PHONE"]) {
-                                echo "<a href='tel:$con[CON_PHONE]'>$con[CON_PHONE]</a>"; 
-                            } else {
-                                echo "<p>0000000000</p>"; 
-                            }
-    
-                            // Checking if email is available
-                            if ($con["CON_EMAIL"]) {
-                                echo "<a href='mailto:$con[CON_EMAIL]'>$con[CON_EMAIL]</a>";
-                            } else {
-                                echo "<p>No available email</p>"; 
-                            }
-    
-                            echo "</div>"; 
                             echo "</div>"; 
                         }
                     } else {

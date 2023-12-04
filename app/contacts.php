@@ -56,13 +56,19 @@
 
         $added = null; 
 
-        if ($title && $phone && $email) {
-            if ($fname && $lname) {
+        if ($title && $email) {
+        
+
+            if ($fname && $lname && $phone) {
                 $added = $database->insertValues("CONTACT", ["CONTACT_TITLE", "CONTACT_FNAME", "CONTACT_LNAME", "CONTACT_PHONE", "CONTACT_EMAIL"], [$title, $fname, $lname, $phone, $email]); 
+            } else if ($fname && $lname) {
+                $added = $database->insertValues("CONTACT", ["CONTACT_TITLE", "CONTACT_FNAME", "CONTACT_LNAME", "CONTACT_EMAIL"], [$title, $fname, $lname, $email]); 
             } else if (($fname && !$lname) || (!$fname && $lname)) {
                 echo "<p class='header-notif'>If adding name, you must include the first and last name.</p>";
-            } else {
+            } else if ($phone) {
                 $added = $database->insertValues("CONTACT", ["CONTACT_TITLE", "CONTACT_PHONE", "CONTACT_EMAIL"], [$title, $phone, $email]); 
+            } else {
+                $added = $database->insertValues("CONTACT", ["CONTACT_TITLE", "CONTACT_EMAIL"], [$title, $email]); 
             }
 
             if ($added) {

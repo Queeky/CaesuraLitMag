@@ -4,7 +4,6 @@ use PhpOffice\PhpWord\Element\AbstractContainer;
 use PhpOffice\PhpWord\Element\Text;
 use PhpOffice\PhpWord\IOFactory as WordIOFactory;
 
-// echo __DIR__; 
 require_once "../vendor/autoload.php"; 
 
 // Checks file type and reads file accordingly 

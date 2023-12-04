@@ -165,7 +165,28 @@ class Database {
         }
     }
 
-    function selectCustom($table, $selected, $wColumn = [], $wValue = [], $wOperator = [], $wCond = "AND", $jTable = [], $jColumn1 = [], $jColumn2 = [], $order = null) {
+    // Checks if image is being used by any other object
+    function checkUsed($id) {
+        $thumbs1 = $this->selectCustom("WORK", ["THUMB_ID"], ["THUMB_ID"], [$id], ["="]); 
+        $thumbs2 = $this->selectCustom("ISSUE", ["THUMB_ID"], ["THUMB_ID"], [$id], ["="]); 
+        $count = 0; 
+
+        foreach ($thumbs1 as $item) {
+            $count = $count + 1; 
+        }
+
+        foreach ($thumbs2 as $item) {
+            $count = $count + 1; 
+        }
+
+        if ($count > 1) {
+            return true; 
+        } else {
+            return false; 
+        }
+    }
+
+    function selectCustom($table, $selected, $wColumn = [], $wValue = [], $wOperator = [], $wCond = "AND", $jTable = [], $jColumn1 = [], $jColumn2 = [], $order = null, $orderType = null) {
         // Sanitizing input
         if ($wValue) {
             $wValue = $this->sanitize($wValue); 
@@ -221,7 +242,7 @@ class Database {
         }
 
         if ($order) {
-            $sql .= "ORDER BY $order "; 
+            $sql .= "ORDER BY $order $orderType"; 
         }
 
         $sql .= ";"; 
@@ -236,6 +257,107 @@ class Database {
         return $array;
     }
 
+    function selectSearch2($queryArray) {
+        $setup = "SELECT WORK.WORK_ID, WORK.WORK_NAME, THUMBNAIL.THUMB_LINK, THUMBNAIL.THUMB_DESCRIPT, "; 
+        $setup .= "ISSUE.ISS_NAME, ISSUE.ISS_DATE, CONTRIBUTOR.CON_FNAME, CONTRIBUTOR.CON_LNAME "; 
+        $setup .= "FROM WORK "; 
+        $setup .= "JOIN THUMBNAIL ON WORK.THUMB_ID = THUMBNAIL.THUMB_ID "; 
+        $setup .= "JOIN ISSUE ON WORK.ISS_ID = ISSUE.ISS_ID "; 
+        $setup .= "JOIN CONTRIBUTOR ON WORK.CON_ID = CONTRIBUTOR.CON_ID "; 
+        $setup .= "JOIN MEDIA_TYPE ON WORK.MEDIA_ID = MEDIA_TYPE.MEDIA_ID "; 
+
+        var_dump($queryArray); 
+
+        // Organized by level of priority
+        $title = null; 
+        $fName = null; 
+        $lName = null; 
+        $issue = null; 
+        $media = null; 
+        $date = null; 
+        $keyword = null; 
+
+        $titleId = array(); 
+        $fNameId = array(); 
+        $lNameId = array(); 
+        $issueId = array(); 
+        $mediaId = array(); 
+        $dateId = array(); 
+        $keywordId = array(); 
+
+        $allElements = array(); 
+
+        foreach ($queryArray as $keyword) {
+            $title = $this->selectCustom("WORK", ["WORK_ID", "WORK_NAME"], ["WORK_NAME"], [$keyword], ["="]); 
+            $fName = $this->selectCustom("CONTRIBUTOR", ["CON_ID", "CON_FNAME"], ["CON_FNAME"], [$keyword], ["="]); 
+            $lName = $this->selectCustom("CONTRIBUTOR", ["CON_ID", "CON_LNAME"], ["CON_LNAME"], [$keyword], ["="]); 
+            $issue = $this->selectCustom("ISSUE", ["ISS_ID", "ISS_NAME"], ["ISS_NAME"], [$keyword], ["like"]); 
+            $media = $this->selectCustom("MEDIA_TYPE", ["MEDIA_ID", "MEDIA_NAME"], ["MEDIA_NAME"], [$keyword], ["="]); 
+            $date = $this->selectCustom("ISSUE", ["ISS_ID", "YEAR(ISS_DATE) AS ISS_DATE"], ["YEAR(ISS_DATE)"], [$keyword], ["="]); 
+            $keyword = $this->selectCustom("WORK", ["WORK_ID"], ["WORK_CONTENT"], [$keyword], ["like"]); 
+        }
+
+        if ($title) {
+            foreach ($title as $id) {
+                array_push($titleId, $id["WORK_NAME"]); 
+            }
+
+            $allElements["WORK.WORK_NAME"] = $titleId; 
+        }
+
+        if ($fName) {
+            foreach ($fName as $id) {
+                array_push($fNameId, $id["CON_FNAME"]); 
+            }
+
+            $allElements["CONTRIBUTOR.CON_FNAME"] = $fNameId; 
+        }
+
+        if ($lName) {
+            foreach ($lName as $id) {
+                array_push($lName, $id["CON_LNAME"]); 
+            }
+
+            $allElements["CONTRIBUTOR.CON_LNAME"] = $lNameId;
+        }
+
+        if ($issue) {
+            foreach ($issue as $id) {
+                array_push($issueId, $id["ISS_NAME"]); 
+            }
+
+            $allElements["ISSUE.ISS_NAME"] = $issueId;
+        }
+
+        if ($media) {
+            foreach ($media as $id) {
+                array_push($mediaId, $id["MEDIA_NAME"]); 
+            }
+
+            $allElements["MEDIA_TYPE.MEDIA_NAME"] = $mediaId;
+        }
+
+        if ($date) {
+            foreach ($date as $id) {
+                array_push($dateId, $id["ISS_DATE"]); 
+            }
+
+            $allElements["YEAR(ISSUE.ISS_DATE)"] = $dateId;
+        }
+
+        if ($keyword) {
+            foreach ($keyword as $id) {
+                array_push($keywordId, $id["WORK_ID"]); 
+            }
+
+            $allElements["WORK.WORK_ID"] = $keywordId;
+        }
+
+
+        $this->selectSearch($allElements); 
+        
+    }
+
     // Selecting IDs using search keywords
     function selectSearch($allIds) {
         $sql = "SELECT WORK.WORK_ID, WORK.WORK_NAME, THUMBNAIL.THUMB_LINK, THUMBNAIL.THUMB_DESCRIPT, "; 
@@ -247,6 +369,8 @@ class Database {
         $sql .= "JOIN MEDIA_TYPE ON WORK.MEDIA_ID = MEDIA_TYPE.MEDIA_ID "; 
 
         $count = 0; 
+
+        // var_dump($allIds); 
 
         // Yo dawg, I heard you like foreach loops, so I put a foreach in a foreach
         // in a foreach in a foreach
@@ -261,21 +385,31 @@ class Database {
 
             foreach ($ids as $id) {
                 if ($count > 0) {
-                    $sql .= "OR "; 
+                    $sql .= "AND "; 
                 }
 
                 $sql .= "$key = $id "; 
 
-                foreach ($allIds as $key2 => $ids2) {
-                    if ($key2 != $key) {
-                        foreach ($ids2 as $id2) {
-                            $sql .= "AND $key2 = $id2 "; 
-                        }
-                    }
-                }
-
                 $count++; 
             }
+
+            // foreach ($ids as $id) {
+            //     if ($count > 0) {
+            //         $sql .= "OR "; 
+            //     }
+
+            //     $sql .= "$key = $id "; 
+
+            //     foreach ($allIds as $key2 => $ids2) {
+            //         if ($key2 != $key) {
+            //             foreach ($ids2 as $id2) {
+            //                 $sql .= "AND $key2 = $id2 "; 
+            //             }
+            //         }
+            //     }
+
+            //     $count++; 
+            // }
         }
 
         $sql .= "UNION "; 
@@ -307,7 +441,7 @@ class Database {
 
         $sql .= ";"; 
 
-        //var_dump($sql); 
+        // var_dump($sql); 
 
         $result = mysqli_query($this->conn, $sql);
         $array = mysqli_fetch_all($result, MYSQLI_ASSOC);
@@ -321,7 +455,7 @@ class Database {
     function selectAllIssues() {
         // $sql = "SELECT ISS_ID, ISS_NAME, YEAR(ISS_DATE) AS ISS_DATE FROM ISSUE"; 
         $sql = "SELECT ISSUE.ISS_ID, ISSUE.ISS_NAME, YEAR(ISSUE.ISS_DATE) AS ISS_DATE, THUMBNAIL.THUMB_LINK, "; 
-        $sql .= "LEFT(ISSUE.ISS_DESCRIPT, 150) AS ISS_DESCRIPT, "; 
+        $sql .= "ISSUE.ISS_DESCRIPT, "; 
         $sql .= "THUMBNAIL.THUMB_DESCRIPT FROM ISSUE "; 
         $sql .= "JOIN THUMBNAIL ON ISSUE.THUMB_ID = THUMBNAIL.THUMB_ID ";
         $sql .= "ORDER BY ISSUE.ISS_DATE DESC"; 
@@ -338,7 +472,7 @@ class Database {
     // OR order by desc but only receiving one; then I can use selectCustom
     function selectRecentIssue() {
         $sql = "SELECT ISSUE.ISS_ID, ISSUE.ISS_NAME, YEAR(ISSUE.ISS_DATE) AS ISS_DATE, THUMBNAIL.THUMB_LINK, "; 
-        $sql .= "LEFT(ISSUE.ISS_DESCRIPT, 150) AS ISS_DESCRIPT, "; 
+        $sql .= "ISS_DESCRIPT, "; 
         $sql .= "THUMBNAIL.THUMB_DESCRIPT FROM ISSUE "; 
         $sql .= "JOIN THUMBNAIL ON ISSUE.THUMB_ID = THUMBNAIL.THUMB_ID "; 
         $sql .= "WHERE ISS_DATE = ( SELECT MAX(ISS_DATE) FROM ISSUE )"; 

@@ -2,6 +2,41 @@
     session_start(); 
     include("includes/connection.inc.php"); 
     include("includes/files.inc.php"); 
+    include("includes/mail.inc.php"); 
+
+    function readAction($database, $mail) {
+        if (isset($_POST['email-submit'])) { 
+            $email = $_POST['email-signup']; 
+
+            if ($email) {
+                $check = null; 
+                $results = $database->selectCustom("EMAIL", ["*"]); 
+
+                // Checking if email already exists in database
+                foreach ($results as $item) {
+                    if ($item["EMAIL_ADDRESS"] == $email) {
+                        $check = true; 
+                    }
+                }
+                
+                if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                    echo "<p class='header-notif'>That is not a valid email address format.</p>";
+                } else if ($check) {
+                    echo "<p class='header-notif'>$email is already registered.</p>";
+                } else {
+                    $added = $database->insertValues("EMAIL", ["EMAIL_ADDRESS"], [$email]); 
+
+                    if ($added) {
+                        echo "<p class='header-notif'>$email successfully registered.</p>";
+                    } else {
+                        echo "<p class='header-notif'>Error registering $email.</p>";
+                    }
+                }
+            } else {
+                echo "<p class='header-notif'>A field is missing information.</p>";
+            }
+        }
+    }
 ?>
 <!DOCTYPE html>
 <html>
@@ -13,32 +48,7 @@
     </head>
     <body>
         <?php 
-            if (isset($_POST['email-submit'])) {
-                $email = $_POST['email-signup']; 
-
-                if ($email) {
-                    // Formatting data
-                    $email = strtolower($email); 
-
-                    // Checking if email already exists in database
-                    $check = $database->selectCustom("EMAIL", ["EMAIL_ID"], ["EMAIL_ADDRESS"], [$email], ["="]); 
-
-                    if (!$check) {
-                        $added = $database->insertValues("EMAIL", ["EMAIL_ADDRESS"], [$email]); 
-
-                        if ($added) {
-                            echo "<p class='header-notif'>$email successfully registered.</p>";
-                        } else {
-                            echo "<p class='header-notif'>Error registering $email.</p>"; 
-                        }
-                    } else {
-                        echo "<p class='header-notif'>$email is already registered.</p>"; 
-                    }
-                } else {
-                    echo "<p class='header-notif'>A field is missing information.</p>";
-                }
-            }
-
+            readAction($database, $mail); 
 
             $title = "CAESURA"; 
             include("includes/nav.inc.php"); 

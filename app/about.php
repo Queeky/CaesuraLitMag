@@ -7,7 +7,20 @@
         $descript = $_POST["descript"]; 
 
         // Transforming newline chars to break tags
-        $descript = nl2br($descript); 
+        $descript = nl2br($descript);
+
+        $descriptArray = explode("<br />", $descript); 
+        $descript = ""; 
+        $count = count($descriptArray); 
+
+        // Removing extra spaces
+        for ($i = 0; $i < $count; $i++) {
+            if (strlen($descriptArray[$i]) < 2) {
+                unset($descriptArray[$i]); 
+            } else {
+                $descript = $descript . $descriptArray[$i] . "<br />"; 
+            }
+        }
 
         $updated = $database->updateValues("ABOUT", ["ABOUT_DESCRIPT"], [$descript]); 
 
