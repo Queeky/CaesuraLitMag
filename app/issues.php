@@ -59,8 +59,7 @@
                         $emails = $database->selectCustom("EMAIL", ["*"]); 
     
                         foreach ($emails as $email) {
-                            // mail($email["EMAIL_ADDRESS"], "NEW ISSUE: " . strtoupper($name), $msg); 
-                            $mail->addAddress($email["EMAIL_ADDRESS"]); 
+                            $mail->addAddress(base64_decode($email["EMAIL_ADDRESS"])); 
                         }
 
                         // Sending the email notifs

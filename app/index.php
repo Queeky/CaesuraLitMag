@@ -4,7 +4,7 @@
     include("includes/files.inc.php"); 
     include("includes/mail.inc.php"); 
 
-    function readAction($database, $mail) {
+    function readAction($database) {
         if (isset($_POST['email-submit'])) { 
             $email = $_POST['email-signup']; 
 
@@ -14,7 +14,7 @@
 
                 // Checking if email already exists in database
                 foreach ($results as $item) {
-                    if ($item["EMAIL_ADDRESS"] == $email) {
+                    if (base64_decode($item["EMAIL_ADDRESS"]) == $email) {
                         $check = true; 
                     }
                 }
@@ -24,7 +24,10 @@
                 } else if ($check) {
                     echo "<p class='header-notif'>$email is already registered.</p>";
                 } else {
-                    $added = $database->insertValues("EMAIL", ["EMAIL_ADDRESS"], [$email]); 
+                    // Encoding email for safe storage
+                    $encoded = base64_encode($email); 
+
+                    $added = $database->insertValues("EMAIL", ["EMAIL_ADDRESS"], [$encoded]); 
 
                     if ($added) {
                         echo "<p class='header-notif'>$email successfully registered.</p>";
