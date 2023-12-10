@@ -6,8 +6,6 @@ function displayDescript($database) {
     if ($descripts) {
         echo "<p class='about-page'>"; 
 
-        echo "<img id='mll-lobby' src='images/MLLLobby.jpg' alt='Image of the MLL lobby entrance.'>"; 
-
         foreach ($descripts as $item) {
             $description = htmlspecialchars_decode($item["ABOUT_DESCRIPT"]);
             echo $description; 

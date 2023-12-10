@@ -116,6 +116,11 @@ class Database {
         }
     }
 
+    // Runs through WORK table and reverts priority to 0
+    function cleanPriority() {
+        $this->updateValues("WORK", ["WORK_PRIORITY"], [0]); 
+    }
+
     // Runs through contributors and makes sure each person has at least 
     // one work to their name; if not, contributor removed
     function cleanContributor() {
@@ -247,8 +252,6 @@ class Database {
 
         $sql .= ";"; 
 
-        // var_dump($sql); 
-
         $result = mysqli_query($this->conn, $sql);
         $array = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
@@ -257,8 +260,11 @@ class Database {
         return $array;
     }
 
-    function selectSearch2($queryArray) {
-        $setup = "SELECT WORK.WORK_ID, WORK.WORK_NAME, THUMBNAIL.THUMB_LINK, THUMBNAIL.THUMB_DESCRIPT, "; 
+    function selectSearch($queryArray) {
+        // Resets priority each time search is called
+        $this->cleanPriority(); 
+
+        $setup = "SELECT WORK.WORK_ID, WORK.WORK_NAME, WORK.WORK_PRIORITY, THUMBNAIL.THUMB_LINK, THUMBNAIL.THUMB_DESCRIPT, "; 
         $setup .= "ISSUE.ISS_NAME, ISSUE.ISS_DATE, CONTRIBUTOR.CON_FNAME, CONTRIBUTOR.CON_LNAME "; 
         $setup .= "FROM WORK "; 
         $setup .= "JOIN THUMBNAIL ON WORK.THUMB_ID = THUMBNAIL.THUMB_ID "; 
@@ -266,119 +272,72 @@ class Database {
         $setup .= "JOIN CONTRIBUTOR ON WORK.CON_ID = CONTRIBUTOR.CON_ID "; 
         $setup .= "JOIN MEDIA_TYPE ON WORK.MEDIA_ID = MEDIA_TYPE.MEDIA_ID "; 
 
-        var_dump($queryArray); 
+        $sql = $setup; 
 
-        // Organized by level of priority
-        $title = null; 
-        $fName = null; 
-        $lName = null; 
-        $issue = null; 
-        $media = null; 
-        $date = null; 
-        $keyword = null; 
+        $title = $fName = $lName = $issue = $media = $date = $keyword = null; 
+        $titles = $fNames = $lNames = $issues = $medias = $dates = $keywords = $allElements = array(); 
 
-        $titleId = array(); 
-        $fNameId = array(); 
-        $lNameId = array(); 
-        $issueId = array(); 
-        $mediaId = array(); 
-        $dateId = array(); 
-        $keywordId = array(); 
+        function orderNUpdate($database, $array, $push, $key, $priority, $string) {
+            foreach ($array as $item) {
+                $toAdd = null; 
 
-        $allElements = array(); 
+                switch($string) {
+                    case true: 
+                        $toAdd = "'" . $item[$key] . "'"; 
+                        break; 
+                    case false: 
+                        $toAdd = $item[$key];
+                        break; 
+                }
+            
+                array_push($push, $toAdd); 
+                $database->updateValues("WORK", ["WORK_PRIORITY"], [$item["WORK_PRIORITY"] + $priority], ["WORK_ID"], [$item["WORK_ID"]]); 
+            }
+
+            return $push; 
+        }
 
         foreach ($queryArray as $keyword) {
-            $title = $this->selectCustom("WORK", ["WORK_ID", "WORK_NAME"], ["WORK_NAME"], [$keyword], ["="]); 
-            $fName = $this->selectCustom("CONTRIBUTOR", ["CON_ID", "CON_FNAME"], ["CON_FNAME"], [$keyword], ["="]); 
-            $lName = $this->selectCustom("CONTRIBUTOR", ["CON_ID", "CON_LNAME"], ["CON_LNAME"], [$keyword], ["="]); 
-            $issue = $this->selectCustom("ISSUE", ["ISS_ID", "ISS_NAME"], ["ISS_NAME"], [$keyword], ["like"]); 
-            $media = $this->selectCustom("MEDIA_TYPE", ["MEDIA_ID", "MEDIA_NAME"], ["MEDIA_NAME"], [$keyword], ["="]); 
-            $date = $this->selectCustom("ISSUE", ["ISS_ID", "YEAR(ISS_DATE) AS ISS_DATE"], ["YEAR(ISS_DATE)"], [$keyword], ["="]); 
-            $keyword = $this->selectCustom("WORK", ["WORK_ID"], ["WORK_CONTENT"], [$keyword], ["like"]); 
-        }
+            $title = $this->selectCustom("WORK", ["WORK_ID, WORK_PRIORITY", "WORK_NAME"], ["WORK_NAME"], [$keyword], ["like"]); 
+            $fName = $this->selectCustom("CONTRIBUTOR", ["WORK.WORK_ID", "WORK.WORK_PRIORITY", "CONTRIBUTOR.CON_ID", "CONTRIBUTOR.CON_FNAME"], ["CONTRIBUTOR.CON_FNAME"], [$keyword], ["="], "AND", ["WORK"], ["CONTRIBUTOR.CON_ID"], ["WORK.CON_ID"]); 
+            $lName = $this->selectCustom("CONTRIBUTOR", ["WORK.WORK_ID", "WORK.WORK_PRIORITY", "CONTRIBUTOR.CON_ID", "CONTRIBUTOR.CON_LNAME"], ["CONTRIBUTOR.CON_LNAME"], [$keyword], ["="], "AND", ["WORK"], ["CONTRIBUTOR.CON_ID"], ["WORK.CON_ID"]);
+            $issue = $this->selectCustom("ISSUE", ["WORK.WORK_ID", "WORK.WORK_PRIORITY", "ISSUE.ISS_ID", "ISSUE.ISS_NAME"], ["ISSUE.ISS_NAME"], [$keyword], ["like"], "AND", ["WORK"], ["ISSUE.ISS_ID"], ["WORK.ISS_ID"]); 
+            $media = $this->selectCustom("MEDIA_TYPE", ["WORK.WORK_ID", "WORK.WORK_PRIORITY", "MEDIA_TYPE.MEDIA_ID", "MEDIA_TYPE.MEDIA_NAME"], ["MEDIA_TYPE.MEDIA_NAME"], [$keyword], ["="], "AND", ["WORK"], ["MEDIA_TYPE.MEDIA_ID"], ["WORK.MEDIA_ID"]); 
+            $date = $this->selectCustom("ISSUE", ["WORK.WORK_ID", "WORK.WORK_PRIORITY", "ISSUE.ISS_ID", "YEAR(ISSUE.ISS_DATE) AS ISS_DATE"], ["YEAR(ISSUE.ISS_DATE)"], [$keyword], ["="], "AND", ["WORK"], ["ISSUE.ISS_ID"], ["WORK.ISS_ID"]); 
+            $keyword = $this->selectCustom("WORK", ["WORK_ID", "WORK_PRIORITY"], ["WORK_CONTENT"], [$keyword], ["like"]); 
 
-        if ($title) {
-            foreach ($title as $id) {
-                array_push($titleId, $id["WORK_NAME"]); 
+            if ($title) {
+                $allElements["WORK.WORK_NAME"] = orderNUpdate($this, $title, $titles, "WORK_NAME", 6, true); 
             }
 
-            $allElements["WORK.WORK_NAME"] = $titleId; 
-        }
-
-        if ($fName) {
-            foreach ($fName as $id) {
-                array_push($fNameId, $id["CON_FNAME"]); 
+            if ($fName) {
+                $allElements["CONTRIBUTOR.CON_FNAME"] = orderNUpdate($this, $fName, $fNames, "CON_FNAME", 5, true); 
             }
 
-            $allElements["CONTRIBUTOR.CON_FNAME"] = $fNameId; 
-        }
-
-        if ($lName) {
-            foreach ($lName as $id) {
-                array_push($lName, $id["CON_LNAME"]); 
+            if ($lName) {
+                $allElements["CONTRIBUTOR.CON_LNAME"] = orderNUpdate($this, $lName, $lNames, "CON_LNAME", 5, true);
             }
 
-            $allElements["CONTRIBUTOR.CON_LNAME"] = $lNameId;
-        }
-
-        if ($issue) {
-            foreach ($issue as $id) {
-                array_push($issueId, $id["ISS_NAME"]); 
+            if ($issue) {
+                $allElements["ISSUE.ISS_NAME"] = orderNUpdate($this, $issue, $issues, "ISS_NAME", 4, true); 
             }
 
-            $allElements["ISSUE.ISS_NAME"] = $issueId;
-        }
-
-        if ($media) {
-            foreach ($media as $id) {
-                array_push($mediaId, $id["MEDIA_NAME"]); 
+            if ($media) {
+                $allElements["MEDIA_TYPE.MEDIA_NAME"] = orderNUpdate($this, $media, $medias, "MEDIA_NAME", 3, true);
             }
 
-            $allElements["MEDIA_TYPE.MEDIA_NAME"] = $mediaId;
-        }
-
-        if ($date) {
-            foreach ($date as $id) {
-                array_push($dateId, $id["ISS_DATE"]); 
+            if ($date) {
+                $allElements["YEAR(ISSUE.ISS_DATE)"] = orderNUpdate($this, $date, $dates, "ISS_DATE", 2, true);
             }
 
-            $allElements["YEAR(ISSUE.ISS_DATE)"] = $dateId;
-        }
-
-        if ($keyword) {
-            foreach ($keyword as $id) {
-                array_push($keywordId, $id["WORK_ID"]); 
+            if ($keyword) {
+                $allElements["WORK.WORK_ID"] = orderNUpdate($this, $keyword, $keywords, "WORK_ID", 1, false); 
             }
-
-            $allElements["WORK.WORK_ID"] = $keywordId;
         }
-
-
-        $this->selectSearch($allElements); 
-        
-    }
-
-    // Selecting IDs using search keywords
-    function selectSearch($allIds) {
-        $sql = "SELECT WORK.WORK_ID, WORK.WORK_NAME, THUMBNAIL.THUMB_LINK, THUMBNAIL.THUMB_DESCRIPT, "; 
-        $sql .= "ISSUE.ISS_NAME, ISSUE.ISS_DATE, CONTRIBUTOR.CON_FNAME, CONTRIBUTOR.CON_LNAME "; 
-        $sql .= "FROM WORK "; 
-        $sql .= "JOIN THUMBNAIL ON WORK.THUMB_ID = THUMBNAIL.THUMB_ID "; 
-        $sql .= "JOIN ISSUE ON WORK.ISS_ID = ISSUE.ISS_ID "; 
-        $sql .= "JOIN CONTRIBUTOR ON WORK.CON_ID = CONTRIBUTOR.CON_ID "; 
-        $sql .= "JOIN MEDIA_TYPE ON WORK.MEDIA_ID = MEDIA_TYPE.MEDIA_ID "; 
 
         $count = 0; 
 
-        // var_dump($allIds); 
-
-        // Yo dawg, I heard you like foreach loops, so I put a foreach in a foreach
-        // in a foreach in a foreach
-
-        // This is currently doing (WORK.WORK_ID = 9 AND ISSUE.ISS_ID = 6) 
-        // and (ISSUE.ISS_ID = 6 AND WORK.WORK_ID = 9), which is unnecessary
-
-        foreach ($allIds as $key => $ids) {
+        foreach ($allElements as $key => $ids) {
             if ($count == 0) {
                 $sql .= "WHERE "; 
             }
@@ -392,38 +351,15 @@ class Database {
 
                 $count++; 
             }
-
-            // foreach ($ids as $id) {
-            //     if ($count > 0) {
-            //         $sql .= "OR "; 
-            //     }
-
-            //     $sql .= "$key = $id "; 
-
-            //     foreach ($allIds as $key2 => $ids2) {
-            //         if ($key2 != $key) {
-            //             foreach ($ids2 as $id2) {
-            //                 $sql .= "AND $key2 = $id2 "; 
-            //             }
-            //         }
-            //     }
-
-            //     $count++; 
-            // }
         }
 
+
         $sql .= "UNION "; 
-        $sql .= "SELECT WORK.WORK_ID, WORK.WORK_NAME, THUMBNAIL.THUMB_LINK, THUMBNAIL.THUMB_DESCRIPT, "; 
-        $sql .= "ISSUE.ISS_NAME, ISSUE.ISS_DATE, CONTRIBUTOR.CON_FNAME, CONTRIBUTOR.CON_LNAME "; 
-        $sql .= "FROM WORK "; 
-        $sql .= "JOIN THUMBNAIL ON WORK.THUMB_ID = THUMBNAIL.THUMB_ID "; 
-        $sql .= "JOIN ISSUE ON WORK.ISS_ID = ISSUE.ISS_ID "; 
-        $sql .= "JOIN CONTRIBUTOR ON WORK.CON_ID = CONTRIBUTOR.CON_ID "; 
-        $sql .= "JOIN MEDIA_TYPE ON WORK.MEDIA_ID = MEDIA_TYPE.MEDIA_ID "; 
+        $sql .= $setup; 
 
         $count = 0; 
 
-        foreach ($allIds as $key => $ids) {
+        foreach ($allElements as $key => $ids) {
             if ($count == 0) {
                 $sql .= "WHERE "; 
             }
@@ -439,7 +375,7 @@ class Database {
             }
         }
 
-        $sql .= ";"; 
+        $sql .= "ORDER BY WORK_PRIORITY DESC;"; 
 
         // var_dump($sql); 
 
@@ -449,6 +385,7 @@ class Database {
         mysqli_free_result($result);
 
         return $array;
+        
     }
 
     // Eventually optimize for the separate page, as well

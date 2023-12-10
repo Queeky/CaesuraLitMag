@@ -12,7 +12,7 @@
                 echo "</div>"; 
 
                 echo "<div class='issue-image'>"; 
-                echo "<a href='archives.php?issue=$issue[ISS_ID]'><img src='$issue[THUMB_LINK]' alt='$issue[THUMB_DESCRIPT]'></a>"; 
+                echo "<a href='archives.php?issue=$issue[ISS_ID]'><img loading='lazy' src='$issue[THUMB_LINK]' alt='$issue[THUMB_DESCRIPT]'></a>"; 
                 echo "</div>"; 
 
                 // Eventually make the description a link, too; 
@@ -84,7 +84,7 @@
                 echo "</div>"; 
 
                 echo "<div class='issue-image'>"; 
-                echo "<a href='archives.php?issue=$issue[ISS_ID]'><img src='$issue[THUMB_LINK]' alt='$issue[THUMB_DESCRIPT]'></a>"; 
+                echo "<a href='archives.php?issue=$issue[ISS_ID]'><img loading='lazy' src='$issue[THUMB_LINK]' alt='$issue[THUMB_DESCRIPT]'></a>"; 
                 echo "</div>"; 
 
                 // Showing remove and update buttons
