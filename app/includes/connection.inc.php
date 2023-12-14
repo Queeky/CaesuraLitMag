@@ -241,7 +241,9 @@ class Database {
                     $sql = $sql . "$wColumn[$i] = '$wValue[$i]' "; 
                     break; 
                 case "like": 
-                    $sql = $sql . "$wColumn[$i] LIKE '%$wValue[$i]%' "; 
+                    $sql = $sql . "($wColumn[$i] LIKE '%$wValue[$i]%' "; 
+                    $sql = $sql . "OR $wColumn[$i] LIKE '%$wValue[$i]' "; 
+                    $sql = $sql . "OR $wColumn[$i] LIKE '%$wValue[$i]%') "; 
                     break; 
             } 
         }
@@ -256,6 +258,8 @@ class Database {
         $array = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
         mysqli_free_result($result);
+
+        // var_dump($sql); 
 
         return $array;
     }
@@ -275,9 +279,11 @@ class Database {
         $sql = $setup; 
 
         $title = $fName = $lName = $issue = $media = $date = $keyword = null; 
-        $titles = $fNames = $lNames = $issues = $medias = $dates = $keywords = $allElements = array(); 
+        $allElements = array(); 
 
-        function orderNUpdate($database, $array, $push, $key, $priority, $string) {
+        function orderNUpdate($database, $array, $key, $priority, $string) {
+            $push = array(); 
+
             foreach ($array as $item) {
                 $toAdd = null; 
 
@@ -291,14 +297,16 @@ class Database {
                 }
             
                 array_push($push, $toAdd); 
-                $database->updateValues("WORK", ["WORK_PRIORITY"], [$item["WORK_PRIORITY"] + $priority], ["WORK_ID"], [$item["WORK_ID"]]); 
+                if ($key != "WORK_ID") {
+                    $database->updateValues("WORK", ["WORK_PRIORITY"], [$item["WORK_PRIORITY"] + $priority], ["WORK_ID"], [$item["WORK_ID"]]);
+                }
             }
 
             return $push; 
         }
 
         foreach ($queryArray as $keyword) {
-            $title = $this->selectCustom("WORK", ["WORK_ID, WORK_PRIORITY", "WORK_NAME"], ["WORK_NAME"], [$keyword], ["like"]); 
+            $title = $this->selectCustom("WORK", ["WORK_ID", "WORK_PRIORITY", "WORK_NAME"], ["WORK_NAME"], [$keyword], ["like"]); 
             $fName = $this->selectCustom("CONTRIBUTOR", ["WORK.WORK_ID", "WORK.WORK_PRIORITY", "CONTRIBUTOR.CON_ID", "CONTRIBUTOR.CON_FNAME"], ["CONTRIBUTOR.CON_FNAME"], [$keyword], ["="], "AND", ["WORK"], ["CONTRIBUTOR.CON_ID"], ["WORK.CON_ID"]); 
             $lName = $this->selectCustom("CONTRIBUTOR", ["WORK.WORK_ID", "WORK.WORK_PRIORITY", "CONTRIBUTOR.CON_ID", "CONTRIBUTOR.CON_LNAME"], ["CONTRIBUTOR.CON_LNAME"], [$keyword], ["="], "AND", ["WORK"], ["CONTRIBUTOR.CON_ID"], ["WORK.CON_ID"]);
             $issue = $this->selectCustom("ISSUE", ["WORK.WORK_ID", "WORK.WORK_PRIORITY", "ISSUE.ISS_ID", "ISSUE.ISS_NAME"], ["ISSUE.ISS_NAME"], [$keyword], ["like"], "AND", ["WORK"], ["ISSUE.ISS_ID"], ["WORK.ISS_ID"]); 
@@ -307,31 +315,31 @@ class Database {
             $keyword = $this->selectCustom("WORK", ["WORK_ID", "WORK_PRIORITY"], ["WORK_CONTENT"], [$keyword], ["like"]); 
 
             if ($title) {
-                $allElements["WORK.WORK_NAME"] = orderNUpdate($this, $title, $titles, "WORK_NAME", 6, true); 
+                $allElements["WORK.WORK_NAME"] = orderNUpdate($this, $title, "WORK_NAME", 5, true); 
             }
 
             if ($fName) {
-                $allElements["CONTRIBUTOR.CON_FNAME"] = orderNUpdate($this, $fName, $fNames, "CON_FNAME", 5, true); 
+                $allElements["CONTRIBUTOR.CON_FNAME"] = orderNUpdate($this, $fName, "CON_FNAME", 4, true); 
             }
 
             if ($lName) {
-                $allElements["CONTRIBUTOR.CON_LNAME"] = orderNUpdate($this, $lName, $lNames, "CON_LNAME", 5, true);
+                $allElements["CONTRIBUTOR.CON_LNAME"] = orderNUpdate($this, $lName, "CON_LNAME", 4, true);
             }
 
             if ($issue) {
-                $allElements["ISSUE.ISS_NAME"] = orderNUpdate($this, $issue, $issues, "ISS_NAME", 4, true); 
+                $allElements["ISSUE.ISS_NAME"] = orderNUpdate($this, $issue,  "ISS_NAME", 3, true); 
             }
 
             if ($media) {
-                $allElements["MEDIA_TYPE.MEDIA_NAME"] = orderNUpdate($this, $media, $medias, "MEDIA_NAME", 3, true);
+                $allElements["MEDIA_TYPE.MEDIA_NAME"] = orderNUpdate($this, $media,  "MEDIA_NAME", 2, true);
             }
 
             if ($date) {
-                $allElements["YEAR(ISSUE.ISS_DATE)"] = orderNUpdate($this, $date, $dates, "ISS_DATE", 2, true);
+                $allElements["YEAR(ISSUE.ISS_DATE)"] = orderNUpdate($this, $date,  "ISS_DATE", 1, true);
             }
 
             if ($keyword) {
-                $allElements["WORK.WORK_ID"] = orderNUpdate($this, $keyword, $keywords, "WORK_ID", 1, false); 
+                $allElements["WORK.WORK_ID"] = orderNUpdate($this, $keyword,  "WORK_ID", 0, false); 
             }
         }
 

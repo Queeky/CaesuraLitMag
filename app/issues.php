@@ -53,8 +53,8 @@
 
                         $mail->isHTML(true); 
                         $mail->Subject = "NEW ISSUE: " . strtoupper($name); 
-                        $mail->Body = "A new issue -- $name -- has been added to Caesura Magazine!" . "<br />" . "Check it out by visiting caesuralitmag.com" . "<br /><br />" . "Here's a sneak peek:" . "<br />" . mb_strimwidth($descript, 0, 150, "..."); 
-                        $mail->AltBody = "A new issue -- $name -- has been added to Caesura Magazine!" . "\n" . "Check it out by visiting caesuralitmag.com" . "\n\n" . "Here's a sneak peek:" . "\n" . mb_strimwidth($descript, 0, 150, "...");
+                        $mail->Body = "A new issue -- $name -- has been added to Caesura Magazine!" . "<br />" . "Check it out by visiting caesuralitmag.com" . "<br /><br />" . "Here's a sneak peek:" . "<br />" . mb_strimwidth($descript, 0, 150, "...") . "<br /><br />" . "<bold>Do not reply to this email.</bold> This email is only for sending notifications. If you want to get in contact, email us at caesura@indwes.edu."; 
+                        $mail->AltBody = "A new issue -- $name -- has been added to Caesura Magazine!" . "\n" . "Check it out by visiting caesuralitmag.com" . "\n\n" . "Here's a sneak peek:" . "\n" . mb_strimwidth($descript, 0, 150, "...") . "\n\n" . "DO NOT REPLY TO THIS EMAIL. This email is only for sending notifications. If you want to get in contact, email us at caesura@indwes.edu.";
     
                         $emails = $database->selectCustom("EMAIL", ["*"]); 
     
