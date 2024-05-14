@@ -1,17 +1,9 @@
 <?php
-
-// Default variables
-$host = "localhost"; 
-$user = "root"; 
-$password = ""; 
-$db = "caesuralitmag_data"; 
-
-
 class Database {
     public $conn; 
 
     function __construct() {
-        $this->conn = mysqli_connect($GLOBALS['host'], $GLOBALS['user'], $GLOBALS['password'], $GLOBALS['db']); 
+        $this->conn = mysqli_connect($_SERVER["DB_HOST"], $_SERVER["DB_USER"], $_SERVER["DB_PASS"], $_SERVER["DB_NAME"]); 
 
         if(!$this->conn) {
             die("Could not connect to database");
