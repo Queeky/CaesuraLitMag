@@ -129,6 +129,8 @@ class Database {
 
     // Checks if contributor already exists
     // If true, returns id; if false, creates new contributor
+
+    // NOTE: Why is this here? Why would it need to return the id?
     function checkContributor($fName, $lName) {
         // Sanitizing input
         $names = $this->sanitize([$fName, $lName]); 

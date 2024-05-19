@@ -58,7 +58,7 @@
         ?>
         <div class='page-wrap'>
             <div class='content-wrap float-left'>
-
+                <div class='recent-issue-container'>
                 <?php 
                     $results = $database->selectRecentIssue(); 
                     include("includes/issue.inc.php"); 
@@ -66,6 +66,7 @@
                     displayIssue($results); 
                     displayWorks($results, $database); 
                 ?>
+                </div>
             </div>
             <?php 
                 include("includes/sidebar.inc.php"); 
