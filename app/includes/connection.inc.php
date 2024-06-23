@@ -54,11 +54,7 @@ class Database {
 
         // var_dump($sql); 
 
-        if (mysqli_query($this->conn, $sql) === true) {
-            return true; 
-        } else {
-            return false; 
-        }
+        return mysqli_query($this->conn, $sql) ? true : false;
     }
 
     function deleteValues($table, $wColumn, $wValue) {
@@ -66,11 +62,7 @@ class Database {
         $sql = "DELETE FROM $table "; 
         $sql .= "WHERE $wColumn = $wValue;"; 
 
-        if (mysqli_query($this->conn, $sql) === true) {
-            return true; 
-        } else {
-            return false; 
-        }
+        return mysqli_query($this->conn, $sql) ? true : false;
     }
 
     function updateValues($table, $selected = [], $values = [], $wColumn = [], $wValue = [], $wCond = "AND") {
@@ -101,94 +93,80 @@ class Database {
 
         $sql .= ";"; 
 
-        if (mysqli_query($this->conn, $sql) === true) {
-            return true; 
-        } else {
-            return false; 
-        }
+        return mysqli_query($this->conn, $sql) ? true : false; 
     }
 
-    // Runs through WORK table and reverts priority to 0
+    // Clears SEARCH table
+
+    // What if multiple people are using the search simultaneously? 
+    // The search table needs to be special to each user
     function cleanPriority() {
         $sql = "DELETE FROM SEARCH WHERE WORK_ID <> 0;"; 
 
-        if (mysqli_query($this->conn, $sql) === true) {
-            return true; 
-        } else {
-            return false; 
-        }
+        return mysqli_query($this->conn, $sql) ? true : false;
     }
 
     // Runs through contributors and makes sure each person has at least 
     // one work to their name; if not, contributor removed
     function cleanContributor() {
-        $conIds = $this->selectCustom("CONTRIBUTOR", ["CON_ID"]); 
+        $sql = "DELETE FROM CONTRIBUTOR "; 
+        $sql .= "WHERE NOT EXISTS(SELECT 1 FROM WORK WHERE WORK.CON_ID = CONTRIBUTOR.CON_ID);"; 
 
-        foreach ($conIds as $id) {
-            $work = $this->selectCustom("WORK", ["WORK_ID"], ["CON_ID"], [$id["CON_ID"]], ["="]); 
-
-            if (!$work) {
-                $this->deleteValues("CONTRIBUTOR", "CON_ID", $id["CON_ID"]); 
-            }
-        }
+        return mysqli_query($this->conn, $sql) ? true : false;
     }
 
-    // Checks if contributor already exists
-    // If true, returns id; if false, creates new contributor
+    // Checks if contributor/thumbnail already exists
+    // If true, returns id; if false, creates new contributor/thumbnail
 
-    // NOTE: Why is this here? Why would it need to return the id?
-    function checkContributor($fName, $lName) {
-        // Sanitizing input
-        $names = $this->sanitize([$fName, $lName]); 
-        $names[0] = $fName; 
-        $names[1] = $lName; 
+    function insertReturnId($input1, $input2, $tag) {
+        if ($tag == "con") {
+            $names = $this->sanitize([$input1, $input2]); 
 
-        $check = $this->selectCustom("CONTRIBUTOR", ["*"], ["CON_FNAME", "CON_LNAME"], [$fName, $lName], ["=", "="]);
-        $conId = null; 
+            $sql = "CALL checkContributor('$names[0]', '$names[1]', @id);";
+            $sql .= "SELECT @id;";
+        } else if ($tag == "thumb") {
+            $descript = $this->sanitize([$input2]); 
 
-        if ($check) {
-            foreach ($check as $con) {
-                $conId = $con["CON_ID"]; 
-            }
-
-            return $conId; 
-        } else {
-            $result = $this->insertValues("CONTRIBUTOR", ["CON_FNAME", "CON_LNAME"], [$fName, $lName]); 
-
-            if (!$result) {
-                echo "<p class='header-notif'>Error pushing $fName $lName to database.</p>"; 
-            } else {
-                echo "<p class='header-notif'>$fName $lName successfully added.</p>"; 
-                $newCon = $this->selectCustom("CONTRIBUTOR", ["MAX(CON_ID) AS CON_ID"]); 
-
-                foreach ($newCon as $id) {
-                    $conId = $id["CON_ID"]; 
-                }
-            }
-
-            return $conId; 
+            $sql = "CALL checkThumbnail('$input1', '$descript[0]', @id);"; 
+            $sql .= "SELECT @id;"; 
         }
+
+        $result = mysqli_multi_query($this->conn, $sql); 
+        $id = null; 
+
+        do {
+            // Store first result set
+            if ($result = mysqli_store_result($this->conn)) {
+              while ($row = mysqli_fetch_row($result)) {
+                if (is_string($row[0])) {
+                    $id = $row[0]; 
+                }
+              }
+              mysqli_free_result($result);
+            }
+            
+             //Prepare next result set
+          } while (mysqli_next_result($this->conn));
+   
+        return $id; 
     }
 
     // Checks if image is being used by any other object
     function checkUsed($id) {
-        $thumbs1 = $this->selectCustom("WORK", ["THUMB_ID"], ["THUMB_ID"], [$id], ["="]); 
-        $thumbs2 = $this->selectCustom("ISSUE", ["THUMB_ID"], ["THUMB_ID"], [$id], ["="]); 
-        $count = 0; 
+        $sql = "SELECT THUMB_ID FROM "; 
+        $sql .= "(SELECT DISTINCT THUMBNAIL.THUMB_ID AS THUMB_ID FROM THUMBNAIL "; 
+        $sql .= "JOIN WORK ON THUMBNAIL.THUMB_ID = WORK.THUMB_ID "; 
+        $sql .= "UNION "; 
+        $sql .= "SELECT DISTINCT THUMBNAIL.THUMB_ID AS THUMB_ID FROM THUMBNAIL "; 
+        $sql .= "JOIN ISSUE ON THUMBNAIL.THUMB_ID = ISSUE.THUMB_ID) AS IDS "; 
+        $sql .= "WHERE THUMB_ID = $id;"; 
 
-        foreach ($thumbs1 as $item) {
-            $count = $count + 1; 
-        }
+        $result = mysqli_query($this->conn, $sql);
+        $array = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
-        foreach ($thumbs2 as $item) {
-            $count = $count + 1; 
-        }
+        mysqli_free_result($result);
 
-        if ($count > 1) {
-            return true; 
-        } else {
-            return false; 
-        }
+        return (!$array) ? false : true; 
     }
 
     function selectCustom($table, $selected, $wColumn = [], $wValue = [], $wOperator = [], $wCond = "AND", $jTable = [], $jColumn1 = [], $jColumn2 = [], $order = null, $orderType = null) {
@@ -265,12 +243,12 @@ class Database {
     }
 
     function selectSearch($queryArray) {
-        // Removing everything from SEARCH table
-        $this->cleanPriority(); 
+        // Generating a random $_SESSION id # to help identify searches
+        if (!isset($_SESSION["sessionId"])) $_SESSION["sessionId"] = uniqid(); 
 
         // Calling searchWorks procedure
         foreach ($queryArray as $keyword) {
-            $sql = "CALL searchWorks('$keyword');"; 
+            $sql = "CALL searchWorks('$keyword', '$_SESSION[sessionId]');"; 
 
             mysqli_query($this->conn, $sql);
         }
@@ -283,6 +261,7 @@ class Database {
         $sql .= "JOIN ISSUE ON WORK.ISS_ID = ISSUE.ISS_ID "; 
         $sql .= "JOIN CONTRIBUTOR ON WORK.CON_ID = CONTRIBUTOR.CON_ID "; 
         $sql .= "JOIN MEDIA_TYPE ON WORK.MEDIA_ID = MEDIA_TYPE.MEDIA_ID ";
+        $sql .= "WHERE SEARCH.SESSION_ID = '$_SESSION[sessionId]' "; 
         $sql .= "ORDER BY SEARCH.WORK_PRIORITY DESC;"; 
 
         // var_dump($sql); 
@@ -291,6 +270,9 @@ class Database {
         $array = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
         mysqli_free_result($result);
+
+        // // Removing everything from SEARCH table
+        $this->cleanPriority(); 
 
         return $array;
     }

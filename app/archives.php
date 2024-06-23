@@ -26,168 +26,96 @@
 
     function readAction($database, $fileSystem) {
         if (isset($_POST["add"])) {
-            $title = $_POST["title"]; 
-            $fname = $_POST["fname"]; 
-            $lname = $_POST["lname"]; 
-            $issue = $_POST["issue"]; 
-            $media = $_POST["media"]; 
-            $doc = $_FILES["doc"]; 
-            $thumb = $_FILES["thumb"]; 
-            $thumbDescript = $_POST["thumbDescript"]; 
             $thumbId = null; 
             $conId = null; 
             $content = null; 
+            $error = 0; 
 
-            if ($title && $fname && $lname && $issue && $media && $doc["name"] && $thumb["name"] && $thumbDescript) {
-                // Getting just the file name (no extension) 
-                $thumbName = pathinfo($thumb["name"], PATHINFO_FILENAME);
+            // Checking submitted form's info
+            if ($_POST["title"] && $_POST["fname"] && $_POST["lname"] && $_POST["issue"] && $_POST["media"]) {
+                // Formatting contributor name
+                $fname = ucfirst(strtolower($_POST["fname"]));
+                $lname = ucfirst(strtolower($_POST["lname"]));
 
-                // Formatting data
-                $fname = ucfirst(strtolower($fname));
-                $lname = ucfirst(strtolower($lname));
+                // Ensuring valid submission (if uploaded img, must have descript)
+                if (($_FILES["doc"]["name"] && ($_FILES["thumb"]["name"] && $_POST["thumbDescript"])) ||
+                    ($_FILES["doc"]["name"] && (!$_FILES["thumb"]["name"] && !$_POST["thumbDescript"])) ||
+                    ($_FILES["thumb"]["name"] && $_POST["thumbDescript"])) {
 
-                $conId = $database->checkContributor($fname, $lname); 
+                    include("includes/readFromFile.inc.php");
 
-                // Uploading files to docs/ and images/
-                $uploadDoc = $fileSystem->upload($doc, "docs"); 
-                $uploadImg = $fileSystem->upload($thumb, "images"); 
+                    if ($_FILES["doc"]["name"]) {
+                        $content = readFromFile($_FILES["doc"]["tmp_name"]); 
+                        $content = $database->sanitize([$content]); 
+                        $content = nl2br($content[0]); 
 
-                include("includes/readFromFile.inc.php");
-
-                if ($uploadDoc) {
-                    $fileType = strtolower(pathinfo(basename($doc["name"]), PATHINFO_EXTENSION)); // Getting file extension
-                    $content = readFromFile($uploadDoc, $fileType); 
-    
-                    $content = nl2br($content); 
-    
-                    if ($uploadImg) {
-                        // Creating thumbnail item in database
-                        $database->insertValues("THUMBNAIL", ["THUMB_NAME", "THUMB_LINK", "THUMB_DESCRIPT"], [$thumbName, $uploadImg, $thumbDescript]); 
-    
-                        // Getting id of new thumbnail item
-                        $ids = $database->selectCustom("THUMBNAIL", ["MAX(THUMB_ID) AS THUMB_ID"]); 
-    
-                        foreach ($ids as $item) {
-                            $thumbId = $item["THUMB_ID"]; 
+                        // If thumbnail was not included, get issue thumbnail 
+                        if (!$_FILES["thumb"]["name"]) {
+                            $thumbId = $database->selectCustom("ISSUE", ["THUMB_ID"], ["ISS_ID"], [$_POST["issue"]], ["="])[0]["THUMB_ID"];
                         }
+                    }
     
-                        $added = $database->insertValues("WORK", ["CON_ID", "ISS_ID", "THUMB_ID", "MEDIA_ID", "WORK_NAME", "WORK_CONTENT", "WORK_LINK"], [$conId, $issue, $thumbId, $media, $title, $content, $uploadDoc]); 
-    
-                        if ($added) {
-                            echo "<p class='header-notif'>$title successfully added.</p>";
+                    if ($_FILES["thumb"]["name"] && $_POST["thumbDescript"]) {
+                        // Uploading file to images/
+                        $uploadImg = $fileSystem->upload($_FILES["thumb"], "images"); 
+
+                        // If doc was not included, make thumbnail descript the content
+                        if (!$_FILES["doc"]["name"]) {
+                            $content = $database->sanitize([$_POST["thumbDescript"]])[0]; 
+                        }
+
+                        if ($uploadImg) {
+                            $thumbId = $database->insertReturnId($uploadImg, $_POST["thumbDescript"], "thumb"); 
                         } else {
-                            echo "<p class='header-notif'>Error pushing $title to database.</p>"; 
+                            echo "<p class='header-notif'>Failed to upload file \"$_FILES[thumb][name]\"</p>"; 
+    
+                            $error = 1; 
                         }
-                    }
-                }
-            } else if ($title && $fname && $lname && $issue && $media && $thumb["name"] && $thumbDescript) {
-                // Getting just the file name (no extension) 
-                $thumbName = pathinfo($thumb["name"], PATHINFO_FILENAME);
+                    }   
 
-                // Formatting data
-                $fname = ucfirst(strtolower($fname));
-                $lname = ucfirst(strtolower($lname));
+                    if ($error == 0) {
+                        $conId = $database->insertReturnId($fname, $lname, "con"); 
 
-                $conId = $database->checkContributor($fname, $lname); 
-                $content = $thumbDescript; 
+                        $added = $database->insertValues("WORK", ["CON_ID", "ISS_ID", "THUMB_ID", "MEDIA_ID", "WORK_NAME", "WORK_CONTENT"], [$conId, $_POST["issue"], $thumbId, $_POST["media"], $_POST["title"], $content]);
 
-                // Uploading file to images/
-                $uploadImg = $fileSystem->upload($thumb, "images");
-
-                // Creating thumbnail item in database
-                $database->insertValues("THUMBNAIL", ["THUMB_NAME", "THUMB_LINK", "THUMB_DESCRIPT"], [$thumbName, $uploadImg, $thumbDescript]); 
-    
-                // Getting id of new thumbnail item
-                $ids = $database->selectCustom("THUMBNAIL", ["MAX(THUMB_ID) AS THUMB_ID"]); 
-
-                foreach ($ids as $item) {
-                    $thumbId = $item["THUMB_ID"]; 
-                }
-
-                $added = $database->insertValues("WORK", ["CON_ID", "ISS_ID", "THUMB_ID", "MEDIA_ID", "WORK_NAME", "WORK_CONTENT", "WORK_LINK"], [$conId, $issue, $thumbId, $media, $title, $content, $uploadImg]); 
-
-                if ($added) {
-                    echo "<p class='header-notif'>$title successfully added.</p>";
-                } else {
-                    echo "<p class='header-notif'>Error pushing $title to database.</p>"; 
-                }
-            } else if ($title && $fname && $lname && $issue && $media && $doc["name"]) {
-                // Getting just the file name (no extension) 
-                $thumbName = pathinfo($thumb["name"], PATHINFO_FILENAME);
-
-                // Formatting data
-                $fname = ucfirst(strtolower($fname));
-                $lname = ucfirst(strtolower($lname));
-
-                $conId = $database->checkContributor($fname, $lname); 
-
-                // Uploading files to docs/ 
-                $uploadDoc = $fileSystem->upload($doc, "docs"); 
-
-                include("includes/readFromFile.inc.php");
-
-                if ($uploadDoc) {
-                    $fileType = strtolower(pathinfo(basename($doc["name"]), PATHINFO_EXTENSION)); // Getting file extension
-                    $content = readFromFile($uploadDoc, $fileType); 
-    
-                    $content = nl2br($content); 
-
-                    $issueThumb = $database->selectCustom("ISSUE", ["THUMB_ID"], ["ISS_ID"], [$issue], ["="]); 
-                    foreach ($issueThumb as $item) {
-                        $thumbId = $item["THUMB_ID"]; 
-                    }
-
-                    $added = $database->insertValues("WORK", ["CON_ID", "ISS_ID", "THUMB_ID", "MEDIA_ID", "WORK_NAME", "WORK_CONTENT", "WORK_LINK"], [$conId, $issue, $thumbId, $media, $title, $content, $uploadDoc]); 
-
-                    if ($added) {
-                        echo "<p class='header-notif'>$title successfully added.</p>";
+                        echo ($added) ? "<p class='header-notif'>Successfully added $_POST[title].</p>" : ""; 
                     } else {
-                        echo "<p class='header-notif'>Error pushing $title to database.</p>"; 
-                    }
+                        echo "<p class='header-notif'>Unable to push $_POST[title] to database.</p>";
+                    } 
+                } else {
+                    echo "<p class='header-notif'>A field is missing information.</p>";
                 }
             } else {
                 echo "<p class='header-notif'>A field is missing information.</p>";
             }
         } else if (isset($_POST["remove"])) {
-            $id = $_POST["remove"]; 
-            $title = null; 
-            $docLink = null; 
-            $thumbLink = null; 
-            $thumbId = null; 
-
-
-            $results = $database->selectCustom("WORK", ["WORK.WORK_NAME", "WORK.WORK_LINK", "THUMBNAIL.THUMB_LINK", "THUMBNAIL.THUMB_ID"], ["WORK_ID"], [$id], ["="], "AND", ["THUMBNAIL"], ["WORK.THUMB_ID"], ["THUMBNAIL.THUMB_ID"]); 
-
-            foreach ($results as $item) {
-                $title = $item["WORK_NAME"]; 
-                $docLink = $item["WORK_LINK"]; 
-                $thumbLink = $item["THUMB_LINK"]; 
-                $thumbId = $item["THUMB_ID"]; 
-            }
+            // $_POST["remove"] stores the id of the to-be-removed work
+            $results = $database->selectCustom("WORK", ["WORK.WORK_NAME", "THUMBNAIL.THUMB_LINK", "THUMBNAIL.THUMB_ID"], ["WORK_ID"], [$_POST["remove"]], ["="], "AND", ["THUMBNAIL"], ["WORK.THUMB_ID"], ["THUMBNAIL.THUMB_ID"]); 
 
             $_SESSION["location"] = "archives.php"; 
             $_SESSION["type"] = "work"; 
 
-            $_SESSION["id"] = $id; 
-            $_SESSION["title"] = $title; 
-            $_SESSION["docLink"] = $docLink; 
-            $_SESSION["thumbLink"] = $thumbLink; 
-            $_SESSION["thumbId"] = $thumbId; 
+            $_SESSION["id"] = $_POST["remove"]; 
+            $_SESSION["title"] = $results[0]["WORK_NAME"]; 
+            $_SESSION["thumbLink"] = $results[0]["THUMB_LINK"]; 
+            $_SESSION["thumbId"] = $results[0]["THUMB_ID"]; 
 
             $fileSystem->confirm(); 
         } else if (isset($_POST["yes"])) {
-            $used = $database->checkUsed($_SESSION["thumbId"]); 
+            // Executing a mysqldump
+            // NOTE: Want this to iterate every day, not every delete
+            // because if every delete, then can't restore multiple works
+            // exec("C:/xampp/mysql/bin/mysqldump --user={$_SERVER['DB_USER']} --host={$_SERVER['DB_HOST']} {$_SERVER['DB_NAME']} --result-file=../backup/test.sql 2>&1", $output);
 
-            if (isset($_SESSION["docLink"])) {
-                $fileSystem->delete($_SESSION["docLink"]); 
-            }
- 
             $removed = $database->deleteValues("WORK", "WORK_ID", $_SESSION["id"]); 
+            $used = $database->checkUsed($_SESSION["thumbId"]); 
 
             if (!$used) {
                 $fileSystem->delete($_SESSION["thumbLink"]);
                 $database->deleteValues("THUMBNAIL", "THUMB_ID", $_SESSION["thumbId"]); 
             }
+
+            $database->cleanContributor(); 
 
             if ($removed) {
                 echo "<p class='header-notif'>$_SESSION[title] successfully removed.</p>";
