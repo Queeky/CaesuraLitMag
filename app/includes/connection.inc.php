@@ -54,11 +54,7 @@ class Database {
 
         // var_dump($sql); 
 
-        if (mysqli_query($this->conn, $sql) === true) {
-            return true; 
-        } else {
-            return false; 
-        }
+        return mysqli_query($this->conn, $sql) ? true : false;
     }
 
     function deleteValues($table, $wColumn, $wValue) {
@@ -66,11 +62,7 @@ class Database {
         $sql = "DELETE FROM $table "; 
         $sql .= "WHERE $wColumn = $wValue;"; 
 
-        if (mysqli_query($this->conn, $sql) === true) {
-            return true; 
-        } else {
-            return false; 
-        }
+        return mysqli_query($this->conn, $sql) ? true : false;
     }
 
     function updateValues($table, $selected = [], $values = [], $wColumn = [], $wValue = [], $wCond = "AND") {
@@ -101,86 +93,80 @@ class Database {
 
         $sql .= ";"; 
 
-        if (mysqli_query($this->conn, $sql) === true) {
-            return true; 
-        } else {
-            return false; 
-        }
+        return mysqli_query($this->conn, $sql) ? true : false; 
     }
 
-    // Runs through WORK table and reverts priority to 0
+    // Clears SEARCH table
+
+    // What if multiple people are using the search simultaneously? 
+    // The search table needs to be special to each user
     function cleanPriority() {
-        $this->updateValues("WORK", ["WORK_PRIORITY"], [0]); 
+        $sql = "DELETE FROM SEARCH WHERE WORK_ID <> 0;"; 
+
+        return mysqli_query($this->conn, $sql) ? true : false;
     }
 
     // Runs through contributors and makes sure each person has at least 
     // one work to their name; if not, contributor removed
     function cleanContributor() {
-        $conIds = $this->selectCustom("CONTRIBUTOR", ["CON_ID"]); 
+        $sql = "DELETE FROM CONTRIBUTOR "; 
+        $sql .= "WHERE NOT EXISTS(SELECT 1 FROM WORK WHERE WORK.CON_ID = CONTRIBUTOR.CON_ID);"; 
 
-        foreach ($conIds as $id) {
-            $work = $this->selectCustom("WORK", ["WORK_ID"], ["CON_ID"], [$id["CON_ID"]], ["="]); 
-
-            if (!$work) {
-                $this->deleteValues("CONTRIBUTOR", "CON_ID", $id["CON_ID"]); 
-            }
-        }
+        return mysqli_query($this->conn, $sql) ? true : false;
     }
 
-    // Checks if contributor already exists
-    // If true, returns id; if false, creates new contributor
-    function checkContributor($fName, $lName) {
-        // Sanitizing input
-        $names = $this->sanitize([$fName, $lName]); 
-        $names[0] = $fName; 
-        $names[1] = $lName; 
+    // Checks if contributor/thumbnail already exists
+    // If true, returns id; if false, creates new contributor/thumbnail
 
-        $check = $this->selectCustom("CONTRIBUTOR", ["*"], ["CON_FNAME", "CON_LNAME"], [$fName, $lName], ["=", "="]);
-        $conId = null; 
+    function insertReturnId($input1, $input2, $tag) {
+        if ($tag == "con") {
+            $names = $this->sanitize([$input1, $input2]); 
 
-        if ($check) {
-            foreach ($check as $con) {
-                $conId = $con["CON_ID"]; 
-            }
+            $sql = "CALL checkContributor('$names[0]', '$names[1]', @id);";
+            $sql .= "SELECT @id;";
+        } else if ($tag == "thumb") {
+            $descript = $this->sanitize([$input2]); 
 
-            return $conId; 
-        } else {
-            $result = $this->insertValues("CONTRIBUTOR", ["CON_FNAME", "CON_LNAME"], [$fName, $lName]); 
-
-            if (!$result) {
-                echo "<p class='header-notif'>Error pushing $fName $lName to database.</p>"; 
-            } else {
-                echo "<p class='header-notif'>$fName $lName successfully added.</p>"; 
-                $newCon = $this->selectCustom("CONTRIBUTOR", ["MAX(CON_ID) AS CON_ID"]); 
-
-                foreach ($newCon as $id) {
-                    $conId = $id["CON_ID"]; 
-                }
-            }
-
-            return $conId; 
+            $sql = "CALL checkThumbnail('$input1', '$descript[0]', @id);"; 
+            $sql .= "SELECT @id;"; 
         }
+
+        $result = mysqli_multi_query($this->conn, $sql); 
+        $id = null; 
+
+        do {
+            // Store first result set
+            if ($result = mysqli_store_result($this->conn)) {
+              while ($row = mysqli_fetch_row($result)) {
+                if (is_string($row[0])) {
+                    $id = $row[0]; 
+                }
+              }
+              mysqli_free_result($result);
+            }
+            
+             //Prepare next result set
+          } while (mysqli_next_result($this->conn));
+   
+        return $id; 
     }
 
     // Checks if image is being used by any other object
     function checkUsed($id) {
-        $thumbs1 = $this->selectCustom("WORK", ["THUMB_ID"], ["THUMB_ID"], [$id], ["="]); 
-        $thumbs2 = $this->selectCustom("ISSUE", ["THUMB_ID"], ["THUMB_ID"], [$id], ["="]); 
-        $count = 0; 
+        $sql = "SELECT THUMB_ID FROM "; 
+        $sql .= "(SELECT DISTINCT THUMBNAIL.THUMB_ID AS THUMB_ID FROM THUMBNAIL "; 
+        $sql .= "JOIN WORK ON THUMBNAIL.THUMB_ID = WORK.THUMB_ID "; 
+        $sql .= "UNION "; 
+        $sql .= "SELECT DISTINCT THUMBNAIL.THUMB_ID AS THUMB_ID FROM THUMBNAIL "; 
+        $sql .= "JOIN ISSUE ON THUMBNAIL.THUMB_ID = ISSUE.THUMB_ID) AS IDS "; 
+        $sql .= "WHERE THUMB_ID = $id;"; 
 
-        foreach ($thumbs1 as $item) {
-            $count = $count + 1; 
-        }
+        $result = mysqli_query($this->conn, $sql);
+        $array = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
-        foreach ($thumbs2 as $item) {
-            $count = $count + 1; 
-        }
+        mysqli_free_result($result);
 
-        if ($count > 1) {
-            return true; 
-        } else {
-            return false; 
-        }
+        return (!$array) ? false : true; 
     }
 
     function selectCustom($table, $selected, $wColumn = [], $wValue = [], $wOperator = [], $wCond = "AND", $jTable = [], $jColumn1 = [], $jColumn2 = [], $order = null, $orderType = null) {
@@ -235,7 +221,7 @@ class Database {
                 case "like": 
                     $sql = $sql . "($wColumn[$i] LIKE '%$wValue[$i]%' "; 
                     $sql = $sql . "OR $wColumn[$i] LIKE '%$wValue[$i]' "; 
-                    $sql = $sql . "OR $wColumn[$i] LIKE '%$wValue[$i]%') "; 
+                    $sql = $sql . "OR $wColumn[$i] LIKE '$wValue[$i]%') "; 
                     break; 
             } 
         }
@@ -257,125 +243,26 @@ class Database {
     }
 
     function selectSearch($queryArray) {
-        // Resets priority each time search is called
-        $this->cleanPriority(); 
+        // Generating a random $_SESSION id # to help identify searches
+        if (!isset($_SESSION["sessionId"])) $_SESSION["sessionId"] = uniqid(); 
 
-        $setup = "SELECT WORK.WORK_ID, WORK.WORK_NAME, WORK.WORK_PRIORITY, THUMBNAIL.THUMB_LINK, THUMBNAIL.THUMB_DESCRIPT, "; 
-        $setup .= "ISSUE.ISS_NAME, ISSUE.ISS_DATE, CONTRIBUTOR.CON_FNAME, CONTRIBUTOR.CON_LNAME "; 
-        $setup .= "FROM WORK "; 
-        $setup .= "JOIN THUMBNAIL ON WORK.THUMB_ID = THUMBNAIL.THUMB_ID "; 
-        $setup .= "JOIN ISSUE ON WORK.ISS_ID = ISSUE.ISS_ID "; 
-        $setup .= "JOIN CONTRIBUTOR ON WORK.CON_ID = CONTRIBUTOR.CON_ID "; 
-        $setup .= "JOIN MEDIA_TYPE ON WORK.MEDIA_ID = MEDIA_TYPE.MEDIA_ID "; 
-
-        $sql = $setup; 
-
-        $title = $fName = $lName = $issue = $media = $date = $keyword = null; 
-        $allElements = array(); 
-
-        function orderNUpdate($database, $array, $key, $priority, $string) {
-            $push = array(); 
-
-            foreach ($array as $item) {
-                $toAdd = null; 
-
-                switch($string) {
-                    case true: 
-                        $toAdd = "'" . $item[$key] . "'"; 
-                        break; 
-                    case false: 
-                        $toAdd = $item[$key];
-                        break; 
-                }
-            
-                array_push($push, $toAdd); 
-                if ($key != "WORK_ID") {
-                    $database->updateValues("WORK", ["WORK_PRIORITY"], [$item["WORK_PRIORITY"] + $priority], ["WORK_ID"], [$item["WORK_ID"]]);
-                }
-            }
-
-            return $push; 
-        }
-
+        // Calling searchWorks procedure
         foreach ($queryArray as $keyword) {
-            $title = $this->selectCustom("WORK", ["WORK_ID", "WORK_PRIORITY", "WORK_NAME"], ["WORK_NAME"], [$keyword], ["like"]); 
-            $fName = $this->selectCustom("CONTRIBUTOR", ["WORK.WORK_ID", "WORK.WORK_PRIORITY", "CONTRIBUTOR.CON_ID", "CONTRIBUTOR.CON_FNAME"], ["CONTRIBUTOR.CON_FNAME"], [$keyword], ["="], "AND", ["WORK"], ["CONTRIBUTOR.CON_ID"], ["WORK.CON_ID"]); 
-            $lName = $this->selectCustom("CONTRIBUTOR", ["WORK.WORK_ID", "WORK.WORK_PRIORITY", "CONTRIBUTOR.CON_ID", "CONTRIBUTOR.CON_LNAME"], ["CONTRIBUTOR.CON_LNAME"], [$keyword], ["="], "AND", ["WORK"], ["CONTRIBUTOR.CON_ID"], ["WORK.CON_ID"]);
-            $issue = $this->selectCustom("ISSUE", ["WORK.WORK_ID", "WORK.WORK_PRIORITY", "ISSUE.ISS_ID", "ISSUE.ISS_NAME"], ["ISSUE.ISS_NAME"], [$keyword], ["like"], "AND", ["WORK"], ["ISSUE.ISS_ID"], ["WORK.ISS_ID"]); 
-            $media = $this->selectCustom("MEDIA_TYPE", ["WORK.WORK_ID", "WORK.WORK_PRIORITY", "MEDIA_TYPE.MEDIA_ID", "MEDIA_TYPE.MEDIA_NAME"], ["MEDIA_TYPE.MEDIA_NAME"], [$keyword], ["="], "AND", ["WORK"], ["MEDIA_TYPE.MEDIA_ID"], ["WORK.MEDIA_ID"]); 
-            $date = $this->selectCustom("ISSUE", ["WORK.WORK_ID", "WORK.WORK_PRIORITY", "ISSUE.ISS_ID", "YEAR(ISSUE.ISS_DATE) AS ISS_DATE"], ["YEAR(ISSUE.ISS_DATE)"], [$keyword], ["="], "AND", ["WORK"], ["ISSUE.ISS_ID"], ["WORK.ISS_ID"]); 
-            $keyword = $this->selectCustom("WORK", ["WORK_ID", "WORK_PRIORITY"], ["WORK_CONTENT"], [$keyword], ["like"]); 
+            $sql = "CALL searchWorks('$keyword', '$_SESSION[sessionId]');"; 
 
-            if ($title) {
-                $allElements["WORK.WORK_NAME"] = orderNUpdate($this, $title, "WORK_NAME", 5, true); 
-            }
-
-            if ($fName) {
-                $allElements["CONTRIBUTOR.CON_FNAME"] = orderNUpdate($this, $fName, "CON_FNAME", 4, true); 
-            }
-
-            if ($lName) {
-                $allElements["CONTRIBUTOR.CON_LNAME"] = orderNUpdate($this, $lName, "CON_LNAME", 4, true);
-            }
-
-            if ($issue) {
-                $allElements["ISSUE.ISS_NAME"] = orderNUpdate($this, $issue,  "ISS_NAME", 3, true); 
-            }
-
-            if ($media) {
-                $allElements["MEDIA_TYPE.MEDIA_NAME"] = orderNUpdate($this, $media,  "MEDIA_NAME", 2, true);
-            }
-
-            if ($date) {
-                $allElements["YEAR(ISSUE.ISS_DATE)"] = orderNUpdate($this, $date,  "ISS_DATE", 1, true);
-            }
-
-            if ($keyword) {
-                $allElements["WORK.WORK_ID"] = orderNUpdate($this, $keyword,  "WORK_ID", 0, false); 
-            }
+            mysqli_query($this->conn, $sql);
         }
-
-        $count = 0; 
-
-        foreach ($allElements as $key => $ids) {
-            if ($count == 0) {
-                $sql .= "WHERE "; 
-            }
-
-            foreach ($ids as $id) {
-                if ($count > 0) {
-                    $sql .= "AND "; 
-                }
-
-                $sql .= "$key = $id "; 
-
-                $count++; 
-            }
-        }
-
-
-        $sql .= "UNION "; 
-        $sql .= $setup; 
-
-        $count = 0; 
-
-        foreach ($allElements as $key => $ids) {
-            if ($count == 0) {
-                $sql .= "WHERE "; 
-            }
-
-            foreach ($ids as $id) {
-                if ($count > 0) {
-                    $sql .= "OR "; 
-                }
-
-                $sql .= "$key = $id "; 
-
-                $count++; 
-            }
-        }
-
-        $sql .= "ORDER BY WORK_PRIORITY DESC;"; 
+        
+        $sql = "SELECT WORK.WORK_ID, WORK.WORK_NAME, THUMBNAIL.THUMB_LINK, THUMBNAIL.THUMB_DESCRIPT, SEARCH.WORK_PRIORITY, "; 
+        $sql .= "ISSUE.ISS_NAME, ISSUE.ISS_DATE, CONTRIBUTOR.CON_FNAME, CONTRIBUTOR.CON_LNAME "; 
+        $sql .= "FROM SEARCH "; 
+        $sql .= "JOIN WORK ON SEARCH.WORK_ID = WORK.WORK_ID ";
+        $sql .= "JOIN THUMBNAIL ON WORK.THUMB_ID = THUMBNAIL.THUMB_ID "; 
+        $sql .= "JOIN ISSUE ON WORK.ISS_ID = ISSUE.ISS_ID "; 
+        $sql .= "JOIN CONTRIBUTOR ON WORK.CON_ID = CONTRIBUTOR.CON_ID "; 
+        $sql .= "JOIN MEDIA_TYPE ON WORK.MEDIA_ID = MEDIA_TYPE.MEDIA_ID ";
+        $sql .= "WHERE SEARCH.SESSION_ID = '$_SESSION[sessionId]' "; 
+        $sql .= "ORDER BY SEARCH.WORK_PRIORITY DESC;"; 
 
         // var_dump($sql); 
 
@@ -384,8 +271,10 @@ class Database {
 
         mysqli_free_result($result);
 
+        // // Removing everything from SEARCH table
+        $this->cleanPriority(); 
+
         return $array;
-        
     }
 
     // Eventually optimize for the separate page, as well

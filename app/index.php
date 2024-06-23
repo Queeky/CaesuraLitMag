@@ -1,5 +1,7 @@
 <?php 
     session_start(); 
+    // NOTE: Session id # is generated in nav.inc.php because this file will run regardless of
+    // what page the user first opens
     include("includes/connection.inc.php"); 
     include("includes/files.inc.php"); 
     include("includes/mail.inc.php"); 
@@ -58,7 +60,7 @@
         ?>
         <div class='page-wrap'>
             <div class='content-wrap float-left'>
-
+                <div class='recent-issue-container'>
                 <?php 
                     $results = $database->selectRecentIssue(); 
                     include("includes/issue.inc.php"); 
@@ -66,6 +68,7 @@
                     displayIssue($results); 
                     displayWorks($results, $database); 
                 ?>
+                </div>
             </div>
             <?php 
                 include("includes/sidebar.inc.php"); 

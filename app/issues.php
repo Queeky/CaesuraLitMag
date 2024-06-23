@@ -103,6 +103,8 @@
             $database->deleteValues("WORK", "ISS_ID", $_SESSION["id"]);  
             $removed = $database->deleteValues("ISSUE", "ISS_ID", $_SESSION["id"]); 
 
+            $database->cleanContributor(); 
+
             if ($removed) {
                 echo "<p class='header-notif'>$_SESSION[title] successfully removed.</p>";
             } else {
