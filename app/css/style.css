@@ -455,6 +455,10 @@ footer {
     width: 5vw; 
 }
 
+.mobile-email, .mobile-email-text {
+    display: none; 
+}
+
 
 /* Home Page */
 
@@ -1102,6 +1106,16 @@ textarea.edit {
     display: block; 
 }
 
+/* Hiding Mobile */
+
+.mobile-search-bar {
+    display: none; 
+}
+
+.mobile-nav {
+    display: none; 
+}
+
 /* Tablet Design */
 
 @media only screen and (max-width: 768px) {
@@ -1112,6 +1126,268 @@ textarea.edit {
 /* Mobile Design */
 
 @media only screen and (max-width: 480px) {
+    * {
+        margin: 0; 
+        padding: 0; 
+    }
+
+    .content-wrap.float-left {
+        display: block; 
+        width: 90vw; 
+        margin-left: 5vw; 
+        margin-right: 5vw; 
+    }
+
+    /* Header  */
+
+    header {
+        height: 50vw; 
+    }
+
+    header > h1 {
+        display: none; 
+    }
+
+    header > img {
+        display: block; 
+        width: 40vw; 
+    }
+
+    nav {
+        position: static; 
+    }
+
+    .mobile-search-bar, .mobile-email {
+        display: flex; 
+        justify-content: center;
+        align-items: center; 
+    }
+
+    .mobile-search-bar {
+        margin-bottom: 6vw; 
+    }
+    
+    .mobile-search-bar > form > div, .mobile-email > form > div {
+        display: flex; 
+        align-items: center; 
+        height: 15vw; 
+    }
+    
+    .mobile-search-bar > form > div > input, .mobile-email > form > div > input {
+        height: 100%; 
+        border: 1px solid black; 
+        border-radius: 0; 
+    }
+    
+    .mobile-search-bar > form > div > input:focus, .mobile-email > form > div > input:focus {
+        outline: none; 
+    }
+    
+    .mobile-search-bar > form > div > input[placeholder], .mobile-email > form > div > input[placeholder] {
+        padding-left: 5vw; 
+        color: grey; 
+        font-size: 6vw; 
+        font-style: italic; 
+    }
+    
+    .mobile-search-bar > form > div, .mobile-email > form > div {
+        width: 100%; 
+    }
+    
+    .mobile-search-bar > form > div > button, .mobile-email > form > div > button {
+        background-color: black; 
+        height: 100%; 
+        width: 14vw; 
+        border: none; 
+    }
+    
+    .mobile-search-bar > form > div > button > img, .mobile-email > form > div > button > img {
+        width: 8vw; 
+    }
+
+
+    /* Nav and Sidebar */
+
+    .full-nav {
+        display: none; 
+    }
+
+    .mobile-nav {
+        display: flex; 
+        justify-content: center;
+        align-items: center; 
+        background-color: white; 
+        margin-bottom: 6vw; 
+    }
+
+    .mobile-nav > ul > li {
+        text-align: center; 
+    }
+
+    .page-wrap {
+        padding-top: 0; 
+        padding-bottom: 0; 
+    }
+
+    .mobile-nav > ul {
+        list-style-type: none; 
+    }
+
+    .mobile-menu-link {
+        font-size: 14vw; 
+        font-family: 'Tahoma', 'Verdana', monospace, sans-serif;
+        text-decoration-line: none; 
+        color: black; 
+        text-align: center; 
+    }
+
+    .mobile-dropdown {
+        display: none; 
+        margin-top: 1vw; 
+        background-color: white; 
+        border-top: 8px solid black; 
+    }
+
+    .mobile-dropdown > ul {
+        text-align: center; 
+    }
+
+    .mobile-dropdown > ul > li {
+        padding-top: 1.5vw; 
+        padding-bottom: 1.5vw; 
+        padding-left: 3vw; 
+        padding-right: 3vw; 
+        list-style: none;  
+    }
+
+    .mobile-dropdown > ul > .home-li {
+        background-color: var(--iss1Primary); 
+    }
+
+   .mobile-dropdown > ul > .about-li {
+        background-color: var(--iss2Primary); 
+    }
+
+    .mobile-dropdown > ul > .archives-li {
+        background-color: var(--iss3Primary); 
+    }
+
+    .mobile-dropdown > ul > .contacts-li {
+        background-color: var(--iss4Primary); 
+    }
+
+    .mobile-dropdown > ul > .submissions-li {
+        background-color: var(--iss5Primary); 
+    }
+
+    .mobile-dropdown > ul > li > a {
+        font-size: 8vw; 
+        font-family: 'Tahoma', 'Verdana', monospace, sans-serif;
+        color: black; 
+        text-decoration-line: none; 
+    }
+
+
+    .sidebar {
+        display: none; 
+    }
+
+    /* Footer  */
+
+    .mobile-email {
+        display: flex; 
+        margin-top: 6vw; 
+        margin-bottom: 6vw; 
+    }
+
+    .mobile-email-text {
+        display: block; 
+        margin-left: 10vw; 
+        margin-right: 10vw;
+        margin-bottom: 6vw;  
+        font-size: 5vw; 
+        text-align: center; 
+        font-family: 'Tahoma', 'Verdana', monospace, sans-serif;
+    }
+
+    .footer-contact > button {
+        display: none; 
+    }
+
+    .footer-socials {
+        padding-top: 6vw; 
+        padding-bottom: 6vw; 
+    }
+
+    .footer-socials img {
+        width: 18vw; 
+    }
+
+    .footer-socials #facebook, .footer-socials #instagram {
+        margin-left: 10vw; 
+    }
+
+    .footer-socials #blog {
+        border-radius: 9vw; 
+    }
+
+    .footer-contact {
+        display: block; 
+        padding-top: 6vw; 
+        padding-bottom: 6vw; 
+    }
+
+    .footer-contact > a {
+        display: block; 
+        text-align: center; 
+        font-size: 6vw; 
+    }
+
+    .footer-contact > a[href^="tel:"] {
+        margin-bottom: 2vw; 
+    }
+
+
+    /* Index Page */
+
+    .issue-works {
+        display: none; 
+    }
+
+    .issue {
+        width: 90vw; 
+        height: auto; 
+    }
+
+    .issue-label > h1 {
+        font-size: 14vw; 
+        padding-top: 6vw; 
+        padding-bottom: 6vw; 
+    }
+
+    .issue-label > h3 {
+        display: none; 
+        /* Make this inline with h1 eventually */
+    }
+
+    .issue img {
+        width: 90vw; 
+        height: auto; 
+    }
+
+    .issue-descript {
+        height: 25vw; 
+    }
+
+    .issue-descript > p {
+        font-size: 5vw; 
+        margin: 4vw; 
+    }
+
+    .recent-issue-container {
+        display: flex; 
+        align-items: center; 
+    }
 
 }
 
