@@ -1,5 +1,17 @@
 <?php
     function displayFooter() {
+        echo "<div class='mobile-email'>"; 
+
+        echo "<form action='index.php' method='POST'>"; 
+        echo "<div>";  
+        echo "<input class='email-signup' type='text' name='email-signup' placeholder='Enter your email'>";
+        echo "<button type='submit' name='email-submit'><img src='images/EmailIcon.png'></button>";   
+        echo "</div>"; 
+        echo "</form>"; 
+
+        echo "</div>"; 
+        echo "<p class='mobile-email-text'>Sign up for email notifications to keep track of new Caesura issues.</p>";
+
         echo "<footer>"; 
 
         echo "<div class='footer-socials'>"; 

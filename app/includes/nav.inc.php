@@ -2,6 +2,10 @@
 
 $results = $database->selectCustom("MEDIA_TYPE", ["*"]); 
 
+echo "<script>"; 
+echo include("javascript/action.js"); 
+echo "</script>"; 
+
 function displayAdmin() {
     echo "<div class='admin-bar'>"; 
 
@@ -27,14 +31,40 @@ function displayHeader($title) {
     echo "<h1>$title</h1>"; 
     echo "<img src='images/CaesuraIcon.png' alt='Caesura icon'>"; 
     echo "</header>"; 
+
+    // Mobile Search Bar
+    echo "<div class='mobile-search-bar'>"; 
+
+    echo "<form action='archives.php' method='GET'>"; 
+    echo "<div>";  
+    echo "<input type='text' name='query' placeholder='Search works'>"; 
+    echo "<button type='submit'><img src='images/SearchIcon.png'></button>"; 
+    echo "</div>"; 
+    echo "</form>"; 
+
+    echo "</div>"; 
 }
 
 function displayNav($results) {
     echo "<nav>"; 
 
     echo "<div class='mobile-nav'>"; 
+    echo "<ul>"; 
+    echo "<li><a class='mobile-menu-link' href='#'>~ MENU ~</a></li>"; 
+
     echo "<div class='mobile-dropdown'>"; 
+    echo "<ul>"; 
+
+    echo "<li class='home-li'><a href='index.php'>HOME</a></li>";
+    echo "<li class='about-li'><a href='about.php'>ABOUT</a></li>"; 
+    echo "<li class='archives-li'><a href='archives.php'>ARCHIVES</a></li>";
+    echo "<li class='contacts-li'><a href='contacts.php'>CONTACTS</a></li>";  
+    echo "<li class='submissions-li'><a href='submissions.php'>SUBMISSIONS</a></li>";  
+
+    echo "</ul>"; 
     echo "</div>"; 
+
+    echo "</ul>"; 
     echo "</div>"; 
 
     echo "<div class='full-nav'>"; 
