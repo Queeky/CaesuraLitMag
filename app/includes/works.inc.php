@@ -48,13 +48,13 @@
         echo "<h3>ADD NEW WORK:</h3>"; 
 
         echo "<div class='text-input'>"; 
-        echo "<input type='text' name='title' placeholder='Enter work title ***'>";
-        echo "<input type='text' name='fname' placeholder='Enter contributor first name ***'>";  
-        echo "<input type='text' name='lname' placeholder='Enter contributor last name ***'>";  
+        echo "<input type='text' name='title' placeholder='Enter work title'>";
+        echo "<input type='text' name='fname' placeholder='Enter contributor first name'>";  
+        echo "<input type='text' name='lname' placeholder='Enter contributor last name'>";  
         echo "</div>"; 
 
         echo "<div class='select-input'>"; 
-        echo "<label for='issue'>CHOOSE ISSUE: ***</label>"; 
+        echo "<label for='issue'>CHOOSE ISSUE:</label>"; 
         echo "<select name='issue'>"; 
 
         foreach ($issues as $issue) {
@@ -63,7 +63,7 @@
 
         echo "</select>"; 
 
-        echo "<label for='media'>CHOOSE MEDIA TYPE: ***</label>"; 
+        echo "<label for='media'>CHOOSE MEDIA TYPE:</label>"; 
         echo "<select name='media'>"; 
 
         foreach ($media as $medium) {
@@ -73,12 +73,29 @@
         echo "</select>"; 
         echo "</div>"; 
 
+        echo "<div class='upload-type'>"; 
+        echo "<label>IS THIS WORK LITERATURE OR ART?</label>"; 
+        echo "<div>"; 
+        echo "<button class='submit-btn upload-type-lit' type='button' name='upload-type'>Literature</button>"; 
+        echo "<button class='submit-btn upload-type-art' type='button' name='upload-type'>Art</button>";
+        echo "</div>"; 
+        echo "</div>"; 
+
         echo "<div class='upload-input'>"; 
-        echo "<label for='doc'>UPLOAD DOCUMENT (SKIP THIS IF UPLOADING ARTWORK): ***</label>"; 
+        echo "<div id='lit'>"; 
+        echo "<label for='doc'>UPLOAD DOCUMENT:</label>"; 
         echo "<input type='file' name='doc'>"; 
-        echo "<label for='doc'>UPLOAD THUMBNAIL (ADD IMG FILE HERE IF ARTWORK): ***</label>"; 
+        echo "<label for='doc'>UPLOAD THUMBNAIL (OPTIONAL):</label>"; 
         echo "<input type='file' name='thumb'>";  
-        echo "<input type='text' name='thumbDescript' placeholder='Enter thumbnail description ***'>";
+        echo "<input type='text' name='thumbDescript' placeholder='Enter thumbnail description'>";
+        echo "</div>"; 
+
+        echo "<div id='art'>"; 
+        echo "<label for='doc'>UPLOAD THUMBNAIL:</label>"; 
+        echo "<input type='file' name='thumb'>";  
+        echo "<input type='text' name='thumbDescript' placeholder='Enter thumbnail description'>";
+        echo "</div>"; 
+    
         echo "</div>"; 
 
         echo "<button class='submit-btn' type='submit' name='add'>Submit</button>"; 

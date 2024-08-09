@@ -918,6 +918,28 @@ textarea.edit {
     font-size: 1.1vw; 
 }
 
+.add-form.archive .submit-btn[type=submit] {
+    margin-top: 2vw; 
+} 
+
+.upload-type > div {
+    display: block; 
+    margin-top: 1vw; 
+}
+
+.upload-type-lit, .upload-type-art {
+    display: inline-block; 
+    margin-right: 0.5vw; 
+}
+
+.upload-input #lit, .upload-input #art {
+    margin-top: 1vw; 
+}
+
+.upload-input > div {
+    display: none; 
+}
+
 .guide-info > form > textarea {
     width: 100%; 
     height: 10vw; 
