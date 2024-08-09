@@ -264,10 +264,10 @@ class Database {
         $sql .= "WHERE SEARCH.SESSION_ID = '$_SESSION[sessionId]' "; 
         $sql .= "ORDER BY SEARCH.WORK_PRIORITY DESC;"; 
 
-        // var_dump($sql); 
-
         $result = mysqli_query($this->conn, $sql);
         $array = mysqli_fetch_all($result, MYSQLI_ASSOC);
+
+        // var_dump($array); 
 
         mysqli_free_result($result);
 

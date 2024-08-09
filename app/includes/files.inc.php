@@ -46,7 +46,7 @@ class FileSystem {
                 $uploadOk = $this->checkDoc($fileType, $uploadOk); 
                 break; 
             case ("images"):
-                $uploadOk = $this->checkImg($fileType, $uploadOk);  
+                $uploadOk = $this->checkImg($file, $fileType, $uploadOk);  
                 break; 
         }
 
@@ -76,10 +76,59 @@ class FileSystem {
     }
 
     // Checking if img fits accepted file types
-    function checkImg($fileType, $uploadOk) {
+    function checkImg($file, $fileType, $uploadOk) {
         if ($fileType != "jpg" && $fileType != "jpeg" && $fileType != "png" && $fileType != "gif") {
             echo "<p class='header-notif'>Cannot accept file type $fileType.</p>";
             $uploadOk = 0; 
+        }
+
+        // Resize img for better performance
+        $imgSpecs = getimagesize($file["tmp_name"]); 
+
+        function resize($imgTemp, $imgSpecs) {
+            $ratio = round($imgSpecs[0] / $imgSpecs[1], 2); 
+            $imgResized = null; 
+
+            // If height > width, set height = 1200 instead of width
+            if ($imgSpecs[1] > $imgSpecs[0]) {
+                $imgResized = imagescale($imgTemp, 1200 * $ratio, 1200); 
+            } else {
+                $imgResized = imagescale($imgTemp, 1200); 
+            }
+
+            return $imgResized; 
+        }
+
+        // Checking if image's width || height > 1200
+        if ($imgSpecs[0] > 1200 || $imgSpecs[1] > 1200) {
+            switch($fileType) {
+                case "jpg": 
+                case "jpeg": 
+                    $imgTemp = imagecreatefromjpeg($file["tmp_name"]); 
+                    $imgResized = resize($imgTemp, $imgSpecs); 
+    
+                    imagejpeg($imgResized, $file["tmp_name"]); 
+    
+                    break;
+                case "png": 
+                    $imgTemp = imagecreatefrompng($file["tmp_name"]); 
+                    $imgResized = resize($imgTemp, $imgSpecs);
+    
+                    imagepng($imgResized, $file["tmp_name"]); 
+    
+                    break;
+                case "gif": 
+                    $imgTemp = imagecreatefromgif($file["tmp_name"]); 
+                    $imgResized = resize($imgTemp, $imgSpecs);
+    
+                    imagegif($imgResized, $file["tmp_name"]); 
+    
+                    break;
+                default: 
+                    $uploadOk = 0; 
+    
+                    break;
+            }
         }
 
         return $uploadOk; 
