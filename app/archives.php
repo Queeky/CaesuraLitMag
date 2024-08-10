@@ -198,7 +198,7 @@
         ?>
 
         <div class='page-wrap'>
-            <div class='content-wrap'>
+            <div class='content-wrap archives'>
                 <?php 
                     include("includes/works.inc.php"); 
                 ?>

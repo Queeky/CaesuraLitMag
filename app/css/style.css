@@ -69,6 +69,10 @@ body {
     width: 16vw; 
 }
 
+.archives .empty-message {
+    width: 40vw; 
+}
+
 .empty-message {
     display: flex;  
     background-color: #F8F8F8; 
@@ -80,6 +84,19 @@ body {
     font-family: 'Tahoma', 'Verdana', monospace, sans-serif; 
     font-size: 1.3vw; 
     color: black; 
+}
+
+.similar-results {
+    display: flex; 
+    justify-content: center; 
+    padding-bottom: 1vw; 
+    margin-bottom: 2vw; 
+    border-bottom: 1px solid black; 
+}
+
+.similar-results > p {
+    font-family: 'Tahoma', 'Verdana', monospace, sans-serif; 
+    font-size: 1.3vw; 
 }
 
 .delete-warning {

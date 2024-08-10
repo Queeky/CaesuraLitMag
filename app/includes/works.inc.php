@@ -1,5 +1,6 @@
 <?php 
     $queryArray = explode(" ", $query); // Breaking up keywords w/ " " delimiter
+    $database = new Database(); // Fix this later
 
     // Use switch statement to choose between searchKeys
     switch($searchKey) {
@@ -17,11 +18,27 @@
             break;  
     }
 
-    function displayWorks($works) {
-        echo "<div class='grid'>"; 
-
+    function displayWorks($works, $query) {
         if ($works) {
+            // echo var_dump($works); 
+            $priority = intval($works[0]["WORK_PRIORITY"]); 
+
+            echo "<div class='grid'>"; 
+
             foreach ($works as $work) {
+                if ($priority > 2 && intval($work["WORK_PRIORITY"]) < 2) {
+                    echo "</div>"; 
+
+                    echo "<div class='similar-results'>"; 
+                    echo "<p>Results similar to '$query'</p>"; 
+                    echo "</div>"; 
+
+                    echo "<div class='grid'>"; 
+                }
+
+                // Setting new priority
+                $priority = intval($work["WORK_PRIORITY"]); 
+
                 echo "<div class='archive-item'>"; 
                 echo "<a href='highlight.php?id=$work[WORK_ID]'><img loading='lazy' src='$work[THUMB_LINK]' alt='$work[THUMB_DESCRIPT]'></a>"; 
                 echo "<div class='archive-info'>"; 
@@ -30,13 +47,17 @@
                 echo "</div>"; 
                 echo "</div>"; 
             }
+
+            echo "</div>"; 
+        } else if (!$works && $query) {
+            echo "<div class='empty-message large'>"; 
+            echo "<p>No results for '$query.'</p>"; 
+            echo "</div>";
         } else {
-            echo "<div class='empty-message large>"; 
+            echo "<div class='empty-message large'>"; 
             echo "<p>Nothing's here at the moment!</p>"; 
             echo "</div>";
         }
-
-        echo "</div>"; 
     }
 
     function displayAdmWorks($works, $database) {
@@ -103,9 +124,9 @@
         echo "</form>"; 
         echo "</div>"; 
 
-        echo "<div class='grid'>"; 
-
         if ($works) {
+            echo "<div class='grid'>"; 
+
             foreach ($works as $work) {
                 echo "<div class='archive-item'>"; 
                 echo "<a href='highlight.php?id=$work[WORK_ID]'><img loading='lazy' src='$work[THUMB_LINK]' alt='$work[THUMB_DESCRIPT]'></a>"; 
@@ -127,18 +148,18 @@
                 echo "</div>"; 
                 echo "</div>"; 
             }
+
+            echo "</div>"; 
         } else {
             echo "<div class='empty-message large>"; 
             echo "<p>Nothing's here at the moment!</p>"; 
             echo "</div>";
         }
-
-        echo "</div>"; 
     }
 
     if (isset($_SESSION["admName"])) {
         displayAdmWorks($works, $database); 
     } else {
-        displayWorks($works); 
+        displayWorks($works, $query); 
     }
 ?>
