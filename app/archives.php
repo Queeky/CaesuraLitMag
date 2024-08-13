@@ -24,9 +24,9 @@
         $searchKey = "media"; 
     }
 
-    // if (isset($_POST['nextPage'])) {
-
-    // }
+    if (!isset($_GET['lastId'])) {
+        $_GET['lastId'] = 0; 
+    }
 
     function readAction($database, $fileSystem) {
         if (isset($_POST["add"])) {

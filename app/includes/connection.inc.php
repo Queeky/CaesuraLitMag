@@ -223,6 +223,12 @@ class Database {
                     $sql = $sql . "OR $wColumn[$i] LIKE '%$wValue[$i]' "; 
                     $sql = $sql . "OR $wColumn[$i] LIKE '$wValue[$i]%') "; 
                     break; 
+                case ">": 
+                    $sql .= "$wColumn[$i] > $wValue[$i] "; 
+                    break; 
+                case "<": 
+                    $sql .= "$wColumn[$i] < $wValue[$i] "; 
+                    break; 
             } 
         }
 

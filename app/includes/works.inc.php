@@ -1,9 +1,8 @@
 <?php 
     $queryArray = explode(" ", $query); // Breaking up keywords w/ " " delimiter
     $database = new Database(); // Fix this later
-    if (!isset($_POST['nextPage'])) {
-        $lastId = 0;
-    } 
+
+    // echo var_dump($GLOBALS); 
 
     // Use switch statement to choose between searchKeys
     switch($searchKey) {
@@ -17,7 +16,7 @@
             $works = $database->selectCustom("WORK", ["WORK.WORK_ID", "WORK.WORK_NAME", "THUMBNAIL.THUMB_LINK", "THUMBNAIL.THUMB_DESCRIPT", "ISSUE.ISS_NAME", "ISSUE.ISS_DATE", "CONTRIBUTOR.CON_FNAME", "CONTRIBUTOR.CON_LNAME"], ["MEDIA_ID"], [$media], ["="], "OR", ["THUMBNAIL", "ISSUE", "CONTRIBUTOR"], ["WORK.THUMB_ID", "WORK.ISS_ID", "WORK.CON_ID"], ["THUMBNAIL.THUMB_ID", "ISSUE.ISS_ID", "CONTRIBUTOR.CON_ID"], "YEAR(ISSUE.ISS_DATE)", "DESC");
             break;
         default: 
-            $works = $database->selectCustom("WORK", ["WORK.WORK_ID", "WORK.WORK_NAME", "THUMBNAIL.THUMB_LINK", "THUMBNAIL.THUMB_DESCRIPT", "ISSUE.ISS_NAME", "ISSUE.ISS_DATE", "CONTRIBUTOR.CON_FNAME", "CONTRIBUTOR.CON_LNAME"], jTable: ["THUMBNAIL", "ISSUE", "CONTRIBUTOR"], jColumn1: ["WORK.THUMB_ID", "WORK.ISS_ID", "WORK.CON_ID"], jColumn2: ["THUMBNAIL.THUMB_ID", "ISSUE.ISS_ID", "CONTRIBUTOR.CON_ID"], order: "YEAR(ISSUE.ISS_DATE)", orderType: "DESC", limit: 16);
+            $works = $database->selectCustom("WORK", ["WORK.WORK_ID", "WORK.WORK_NAME", "THUMBNAIL.THUMB_LINK", "THUMBNAIL.THUMB_DESCRIPT", "ISSUE.ISS_NAME", "ISSUE.ISS_DATE", "CONTRIBUTOR.CON_FNAME", "CONTRIBUTOR.CON_LNAME"], wColumn: ["WORK_ID"], wValue: [$_GET['lastId']], wOperator: [">"],  jTable: ["THUMBNAIL", "ISSUE", "CONTRIBUTOR"], jColumn1: ["WORK.THUMB_ID", "WORK.ISS_ID", "WORK.CON_ID"], jColumn2: ["THUMBNAIL.THUMB_ID", "ISSUE.ISS_ID", "CONTRIBUTOR.CON_ID"], order: "YEAR(ISSUE.ISS_DATE)", orderType: "DESC", limit: 16);
             break;  
     }
 
@@ -54,6 +53,15 @@
                 echo "</div>"; 
                 echo "</div>"; 
             }
+
+            echo "</div>"; 
+
+            echo "<div class='next-page'>"; 
+
+            // Add something here to signify when reaching first or last page
+            echo "<p><a href='#'>Previous Page</a></p>"; 
+            echo "<p> | </p>"; 
+            echo "<p><a href='archives.php?lastId=$lastId'>Next Page</a></p>"; 
 
             echo "</div>"; 
         } else if (!$works && $query) {
