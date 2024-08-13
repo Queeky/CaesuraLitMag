@@ -24,6 +24,10 @@
         $searchKey = "media"; 
     }
 
+    // if (isset($_POST['nextPage'])) {
+
+    // }
+
     function readAction($database, $fileSystem) {
         if (isset($_POST["add"])) {
             $thumbId = null; 

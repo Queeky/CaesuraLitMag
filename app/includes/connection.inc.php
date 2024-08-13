@@ -169,7 +169,7 @@ class Database {
         return (!$array) ? false : true; 
     }
 
-    function selectCustom($table, $selected, $wColumn = [], $wValue = [], $wOperator = [], $wCond = "AND", $jTable = [], $jColumn1 = [], $jColumn2 = [], $order = null, $orderType = null) {
+    function selectCustom($table, $selected, $wColumn = [], $wValue = [], $wOperator = [], $wCond = "AND", $jTable = [], $jColumn1 = [], $jColumn2 = [], $order = null, $orderType = null, $limit = null) {
         // Sanitizing input
         if ($wValue) {
             $wValue = $this->sanitize($wValue); 
@@ -227,7 +227,11 @@ class Database {
         }
 
         if ($order) {
-            $sql .= "ORDER BY $order $orderType"; 
+            $sql .= "ORDER BY $order $orderType "; 
+        }
+
+        if ($limit) {
+            $sql .= "LIMIT $limit";  
         }
 
         $sql .= ";"; 

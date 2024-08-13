@@ -1,6 +1,9 @@
 <?php 
     $queryArray = explode(" ", $query); // Breaking up keywords w/ " " delimiter
     $database = new Database(); // Fix this later
+    if (!isset($_POST['nextPage'])) {
+        $lastId = 0;
+    } 
 
     // Use switch statement to choose between searchKeys
     switch($searchKey) {
@@ -14,19 +17,23 @@
             $works = $database->selectCustom("WORK", ["WORK.WORK_ID", "WORK.WORK_NAME", "THUMBNAIL.THUMB_LINK", "THUMBNAIL.THUMB_DESCRIPT", "ISSUE.ISS_NAME", "ISSUE.ISS_DATE", "CONTRIBUTOR.CON_FNAME", "CONTRIBUTOR.CON_LNAME"], ["MEDIA_ID"], [$media], ["="], "OR", ["THUMBNAIL", "ISSUE", "CONTRIBUTOR"], ["WORK.THUMB_ID", "WORK.ISS_ID", "WORK.CON_ID"], ["THUMBNAIL.THUMB_ID", "ISSUE.ISS_ID", "CONTRIBUTOR.CON_ID"], "YEAR(ISSUE.ISS_DATE)", "DESC");
             break;
         default: 
-            $works = $database->selectCustom("WORK", ["WORK.WORK_ID", "WORK.WORK_NAME", "THUMBNAIL.THUMB_LINK", "THUMBNAIL.THUMB_DESCRIPT", "ISSUE.ISS_NAME", "ISSUE.ISS_DATE", "CONTRIBUTOR.CON_FNAME", "CONTRIBUTOR.CON_LNAME"], jTable: ["THUMBNAIL", "ISSUE", "CONTRIBUTOR"], jColumn1: ["WORK.THUMB_ID", "WORK.ISS_ID", "WORK.CON_ID"], jColumn2: ["THUMBNAIL.THUMB_ID", "ISSUE.ISS_ID", "CONTRIBUTOR.CON_ID"], order: "YEAR(ISSUE.ISS_DATE)", orderType: "DESC");
+            $works = $database->selectCustom("WORK", ["WORK.WORK_ID", "WORK.WORK_NAME", "THUMBNAIL.THUMB_LINK", "THUMBNAIL.THUMB_DESCRIPT", "ISSUE.ISS_NAME", "ISSUE.ISS_DATE", "CONTRIBUTOR.CON_FNAME", "CONTRIBUTOR.CON_LNAME"], jTable: ["THUMBNAIL", "ISSUE", "CONTRIBUTOR"], jColumn1: ["WORK.THUMB_ID", "WORK.ISS_ID", "WORK.CON_ID"], jColumn2: ["THUMBNAIL.THUMB_ID", "ISSUE.ISS_ID", "CONTRIBUTOR.CON_ID"], order: "YEAR(ISSUE.ISS_DATE)", orderType: "DESC", limit: 16);
             break;  
     }
 
     function displayWorks($works, $query) {
         if ($works) {
             // echo var_dump($works); 
-            $priority = intval($works[0]["WORK_PRIORITY"]); 
+
+            // Checking if a search is in action; otherwise, WORK_PRIORITY does 
+            // not exist in results
+            $query ? $priority = intval($works[0]["WORK_PRIORITY"]) : $priority = null; 
+            $lastId = $works[count($works) - 1]["WORK_ID"]; 
 
             echo "<div class='grid'>"; 
 
             foreach ($works as $work) {
-                if ($priority > 2 && intval($work["WORK_PRIORITY"]) < 2) {
+                if ($priority && ($priority > 2 && intval($work["WORK_PRIORITY"]) < 2)) {
                     echo "</div>"; 
 
                     echo "<div class='similar-results'>"; 
@@ -37,7 +44,7 @@
                 }
 
                 // Setting new priority
-                $priority = intval($work["WORK_PRIORITY"]); 
+                $priority ? $priority = intval($work["WORK_PRIORITY"]) : $priority = null; 
 
                 echo "<div class='archive-item'>"; 
                 echo "<a href='highlight.php?id=$work[WORK_ID]'><img loading='lazy' src='$work[THUMB_LINK]' alt='$work[THUMB_DESCRIPT]'></a>"; 
