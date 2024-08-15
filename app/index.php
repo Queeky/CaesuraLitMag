@@ -1,7 +1,5 @@
 <?php 
     session_start(); 
-    // NOTE: Session id # is generated in nav.inc.php because this file will run regardless of
-    // what page the user first opens
     include("includes/connection.inc.php"); 
     include("includes/files.inc.php"); 
     include("includes/mail.inc.php"); 

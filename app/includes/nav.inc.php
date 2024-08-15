@@ -1,6 +1,18 @@
 <?php 
+$database = new Database(); // Fix this later
+                            // Intelephense does not recognize the original $database
+                            // set since nested "too deep"; doesn't actually effect
+                            // function, tho
+$table = "(SELECT WORK_ID FROM WORK ORDER BY WORK_ID ASC LIMIT 1) AS W1, "; 
+$table .= "(SELECT WORK_ID FROM WORK ORDER BY WORK_ID DESC LIMIT 1) AS W2"; 
 
 $results = $database->selectCustom("MEDIA_TYPE", ["*"]); 
+$idRange = $database->selectCustom($table, ["W1.WORK_ID AS FIRST_WORK", "W2.WORK_ID AS LAST_WORK"]); 
+
+// Finding first and last work id so archive next/previous button can sense
+// when it reaches a stopping point
+if (!isset($_SESSION["firstWorkId"])) $_SESSION["firstWorkId"] = $idRange[0]["FIRST_WORK"]; 
+if (!isset($_SESSION["lastWorkId"])) $_SESSION["lastWorkId"] = $idRange[0]["LAST_WORK"]; 
 
 echo "<script>"; 
 echo include("javascript/action.js"); 

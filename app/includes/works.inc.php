@@ -16,7 +16,15 @@
             $works = $database->selectCustom("WORK", ["WORK.WORK_ID", "WORK.WORK_NAME", "THUMBNAIL.THUMB_LINK", "THUMBNAIL.THUMB_DESCRIPT", "ISSUE.ISS_NAME", "ISSUE.ISS_DATE", "CONTRIBUTOR.CON_FNAME", "CONTRIBUTOR.CON_LNAME"], ["MEDIA_ID"], [$media], ["="], "OR", ["THUMBNAIL", "ISSUE", "CONTRIBUTOR"], ["WORK.THUMB_ID", "WORK.ISS_ID", "WORK.CON_ID"], ["THUMBNAIL.THUMB_ID", "ISSUE.ISS_ID", "CONTRIBUTOR.CON_ID"], "YEAR(ISSUE.ISS_DATE)", "DESC");
             break;
         default: 
-            $works = $database->selectCustom("WORK", ["WORK.WORK_ID", "WORK.WORK_NAME", "THUMBNAIL.THUMB_LINK", "THUMBNAIL.THUMB_DESCRIPT", "ISSUE.ISS_NAME", "ISSUE.ISS_DATE", "CONTRIBUTOR.CON_FNAME", "CONTRIBUTOR.CON_LNAME"], wColumn: ["WORK_ID"], wValue: [$_GET['lastId']], wOperator: [">"],  jTable: ["THUMBNAIL", "ISSUE", "CONTRIBUTOR"], jColumn1: ["WORK.THUMB_ID", "WORK.ISS_ID", "WORK.CON_ID"], jColumn2: ["THUMBNAIL.THUMB_ID", "ISSUE.ISS_ID", "CONTRIBUTOR.CON_ID"], order: "YEAR(ISSUE.ISS_DATE)", orderType: "DESC", limit: 16);
+            if (isset($_POST['firstShownId'])) {
+                $table = "(SELECT WORK.WORK_ID, WORK.WORK_NAME, THUMBNAIL.THUMB_LINK, THUMBNAIL.THUMB_DESCRIPT, ISSUE.ISS_NAME, ISSUE.ISS_DATE, CONTRIBUTOR.CON_FNAME, CONTRIBUTOR.CON_LNAME FROM WORK JOIN THUMBNAIL ON WORK.THUMB_ID = THUMBNAIL.THUMB_ID JOIN ISSUE ON WORK.ISS_ID = ISSUE.ISS_ID JOIN CONTRIBUTOR ON WORK.CON_ID = CONTRIBUTOR.CON_ID "; 
+                $table .= "WHERE WORK.WORK_ID < $_POST[firstShownId] "; 
+                $table .= "ORDER BY WORK.WORK_ID DESC LIMIT 16) WORK"; 
+
+                $works = $database->selectCustom($table, ["*"], order: "WORK_ID", orderType: "ASC");
+            } else {
+                $works = $database->selectCustom("WORK", ["WORK.WORK_ID", "WORK.WORK_NAME", "THUMBNAIL.THUMB_LINK", "THUMBNAIL.THUMB_DESCRIPT", "ISSUE.ISS_NAME", "ISSUE.ISS_DATE", "CONTRIBUTOR.CON_FNAME", "CONTRIBUTOR.CON_LNAME"], wColumn: ["WORK_ID"], wValue: [$_POST['lastShownId']], wOperator: [">"],  jTable: ["THUMBNAIL", "ISSUE", "CONTRIBUTOR"], jColumn1: ["WORK.THUMB_ID", "WORK.ISS_ID", "WORK.CON_ID"], jColumn2: ["THUMBNAIL.THUMB_ID", "ISSUE.ISS_ID", "CONTRIBUTOR.CON_ID"], order: "YEAR(ISSUE.ISS_DATE)", orderType: "DESC", limit: 16);
+            }
             break;  
     }
 
@@ -27,7 +35,8 @@
             // Checking if a search is in action; otherwise, WORK_PRIORITY does 
             // not exist in results
             $query ? $priority = intval($works[0]["WORK_PRIORITY"]) : $priority = null; 
-            $lastId = $works[count($works) - 1]["WORK_ID"]; 
+            $firstShownId = $works[0]["WORK_ID"]; 
+            $lastShownId = $works[count($works) - 1]["WORK_ID"]; 
 
             echo "<div class='grid'>"; 
 
@@ -56,13 +65,24 @@
 
             echo "</div>"; 
 
-            echo "<div class='next-page'>"; 
+            echo "<div class='next-page'>";
+            echo "<form action='archives.php' method='POST'>";  
 
-            // Add something here to signify when reaching first or last page
-            echo "<p><a href='#'>Previous Page</a></p>"; 
+            if ($firstShownId == $_SESSION["firstWorkId"]) {
+                echo "<button type='button' style='color:grey; text-decoration:none;'>Previous Page</button>";
+            } else {
+                echo "<button type='submit' name='firstShownId' value=$firstShownId>Previous Page</button>";
+            }
+
             echo "<p> | </p>"; 
-            echo "<p><a href='archives.php?lastId=$lastId'>Next Page</a></p>"; 
 
+            if ($lastShownId == $_SESSION["lastWorkId"]) {
+                echo "<button type='button' style='color:grey; text-decoration:none;'>Next Page</button>"; 
+            } else {
+                echo "<button type='submit' name='lastShownId' value=$lastShownId>Next Page</button>"; 
+            }
+
+            echo "</form>"; 
             echo "</div>"; 
         } else if (!$works && $query) {
             echo "<div class='empty-message large'>"; 

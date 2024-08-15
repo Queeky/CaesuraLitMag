@@ -24,8 +24,8 @@
         $searchKey = "media"; 
     }
 
-    if (!isset($_GET['lastId'])) {
-        $_GET['lastId'] = 0; 
+    if (!isset($_POST['lastShownId'])) {
+        $_POST['lastShownId'] = 0; 
     }
 
     function readAction($database, $fileSystem) {

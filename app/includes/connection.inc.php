@@ -242,12 +242,12 @@ class Database {
 
         $sql .= ";"; 
 
+        // var_dump($sql); 
+
         $result = mysqli_query($this->conn, $sql);
         $array = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
         mysqli_free_result($result);
-
-        // var_dump($sql); 
 
         return $array;
     }

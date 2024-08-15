@@ -136,21 +136,26 @@ body {
     border-top: 1px solid black; 
 }
 
-.next-page > p {
+.next-page > form {
+    display: flex; 
+}
+
+.next-page > form > button {
     display: inline-block; 
     margin-left: 1vw; 
     margin-right: 1vw; 
-}
-
-.next-page > p > a {
     font-family:'Times New Roman', Times, serif; 
     font-size: 1.3vw;
     text-decoration: none; 
     color: black; 
+    background-color: none; 
+    background: none; 
+    border: none; 
 }
 
-.next-page > p > a:hover {
+.next-page > form > button:hover {
     text-decoration: underline; 
+    background-color: none; 
 }
 
 /* Header  */
@@ -1209,6 +1214,10 @@ textarea.edit {
         /* border: 1px solid blue;  */
     }
 
+    /* Messages  */
+
+
+
 
     /* Header  */
 
@@ -1523,6 +1532,21 @@ textarea.edit {
     .grid > .archive-item > div > p:last-child {
         margin-top: 2vw; 
         font-size: 5vw; 
+    }
+
+    .next-page {
+        padding-top: 5vw; 
+        padding-bottom: 5vw; 
+    }
+
+    .next-page > form > button {
+        margin-left: 3vw; 
+        margin-right: 3vw; 
+        font-size: 6vw; 
+    }
+
+    .next-page > form > p {
+        font-size: 6vw; 
     }
 
 
