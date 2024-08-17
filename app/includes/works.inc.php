@@ -18,12 +18,12 @@
         default: 
             if (isset($_POST['firstShownId'])) {
                 $table = "(SELECT WORK.WORK_ID, WORK.WORK_NAME, THUMBNAIL.THUMB_LINK, THUMBNAIL.THUMB_DESCRIPT, ISSUE.ISS_NAME, ISSUE.ISS_DATE, CONTRIBUTOR.CON_FNAME, CONTRIBUTOR.CON_LNAME FROM WORK JOIN THUMBNAIL ON WORK.THUMB_ID = THUMBNAIL.THUMB_ID JOIN ISSUE ON WORK.ISS_ID = ISSUE.ISS_ID JOIN CONTRIBUTOR ON WORK.CON_ID = CONTRIBUTOR.CON_ID "; 
-                $table .= "WHERE WORK.WORK_ID < $_POST[firstShownId] "; 
-                $table .= "ORDER BY WORK.WORK_ID DESC LIMIT 16) WORK"; 
+                $table .= "WHERE WORK.WORK_ID > $_POST[firstShownId] "; 
+                $table .= "ORDER BY WORK.WORK_ID ASC LIMIT 16) WORK"; 
 
-                $works = $database->selectCustom($table, ["*"], order: "WORK_ID", orderType: "ASC");
+                $works = $database->selectCustom($table, ["*"], order: "WORK_ID", orderType: "DESC");
             } else {
-                $works = $database->selectCustom("WORK", ["WORK.WORK_ID", "WORK.WORK_NAME", "THUMBNAIL.THUMB_LINK", "THUMBNAIL.THUMB_DESCRIPT", "ISSUE.ISS_NAME", "ISSUE.ISS_DATE", "CONTRIBUTOR.CON_FNAME", "CONTRIBUTOR.CON_LNAME"], wColumn: ["WORK_ID"], wValue: [$_POST['lastShownId']], wOperator: [">"],  jTable: ["THUMBNAIL", "ISSUE", "CONTRIBUTOR"], jColumn1: ["WORK.THUMB_ID", "WORK.ISS_ID", "WORK.CON_ID"], jColumn2: ["THUMBNAIL.THUMB_ID", "ISSUE.ISS_ID", "CONTRIBUTOR.CON_ID"], order: "YEAR(ISSUE.ISS_DATE)", orderType: "DESC", limit: 16);
+                $works = $database->selectCustom("WORK", ["WORK.WORK_ID", "WORK.WORK_NAME", "THUMBNAIL.THUMB_LINK", "THUMBNAIL.THUMB_DESCRIPT", "ISSUE.ISS_NAME", "ISSUE.ISS_DATE", "CONTRIBUTOR.CON_FNAME", "CONTRIBUTOR.CON_LNAME"], wColumn: ["WORK_ID"], wValue: [$_POST['lastShownId']], wOperator: ["<"],  jTable: ["THUMBNAIL", "ISSUE", "CONTRIBUTOR"], jColumn1: ["WORK.THUMB_ID", "WORK.ISS_ID", "WORK.CON_ID"], jColumn2: ["THUMBNAIL.THUMB_ID", "ISSUE.ISS_ID", "CONTRIBUTOR.CON_ID"], order: "WORK.WORK_ID", orderType: "DESC", limit: 16);
             }
             break;  
     }
@@ -68,7 +68,7 @@
             echo "<div class='next-page'>";
             echo "<form action='archives.php' method='POST'>";  
 
-            if ($firstShownId == $_SESSION["firstWorkId"]) {
+            if ($firstShownId == $_SESSION["lastWorkId"]) {
                 echo "<button type='button' style='color:grey; text-decoration:none;'>Previous Page</button>";
             } else {
                 echo "<button type='submit' name='firstShownId' value=$firstShownId>Previous Page</button>";
@@ -76,7 +76,7 @@
 
             echo "<p> | </p>"; 
 
-            if ($lastShownId == $_SESSION["lastWorkId"]) {
+            if ($lastShownId == $_SESSION["firstWorkId"]) {
                 echo "<button type='button' style='color:grey; text-decoration:none;'>Next Page</button>"; 
             } else {
                 echo "<button type='submit' name='lastShownId' value=$lastShownId>Next Page</button>"; 

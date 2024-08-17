@@ -25,7 +25,7 @@
     }
 
     if (!isset($_POST['lastShownId'])) {
-        $_POST['lastShownId'] = 0; 
+        $_POST['lastShownId'] = strval(intval($_SESSION['lastWorkId']) + 1); 
     }
 
     function readAction($database, $fileSystem) {
