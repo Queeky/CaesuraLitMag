@@ -272,7 +272,9 @@ class Database {
         $sql .= "JOIN CONTRIBUTOR ON WORK.CON_ID = CONTRIBUTOR.CON_ID "; 
         $sql .= "JOIN MEDIA_TYPE ON WORK.MEDIA_ID = MEDIA_TYPE.MEDIA_ID ";
         $sql .= "WHERE SEARCH.SESSION_ID = '$_SESSION[sessionId]' "; 
-        $sql .= "ORDER BY SEARCH.WORK_PRIORITY DESC;"; 
+        $sql .= "ORDER BY SEARCH.WORK_PRIORITY DESC, SEARCH.WORK_ID DESC;"; 
+
+        // echo var_dump($sql); 
 
         $result = mysqli_query($this->conn, $sql);
         $array = mysqli_fetch_all($result, MYSQLI_ASSOC);

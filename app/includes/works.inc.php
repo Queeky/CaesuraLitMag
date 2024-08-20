@@ -10,7 +10,7 @@
             $works = $database->selectSearch($queryArray); 
             break; 
         case "issue": 
-            $works = $database->selectCustom("WORK", ["WORK.WORK_ID", "WORK.WORK_NAME", "THUMBNAIL.THUMB_LINK", "THUMBNAIL.THUMB_DESCRIPT", "ISSUE.ISS_NAME", "ISSUE.ISS_DATE", "CONTRIBUTOR.CON_FNAME", "CONTRIBUTOR.CON_LNAME"], ["ISSUE.ISS_ID"], [$issue], ["="], "OR", ["THUMBNAIL", "ISSUE", "CONTRIBUTOR"], ["WORK.THUMB_ID", "WORK.ISS_ID", "WORK.CON_ID"], ["THUMBNAIL.THUMB_ID", "ISSUE.ISS_ID", "CONTRIBUTOR.CON_ID"], "YEAR(ISSUE.ISS_DATE)", "DESC");
+            $works = $database->selectCustom("WORK", ["WORK.WORK_ID", "WORK.WORK_NAME", "THUMBNAIL.THUMB_LINK", "THUMBNAIL.THUMB_DESCRIPT", "ISSUE.ISS_NAME", "ISSUE.ISS_DATE", "CONTRIBUTOR.CON_FNAME", "CONTRIBUTOR.CON_LNAME"], ["ISSUE.ISS_ID"], [$issue], ["="], "OR", ["THUMBNAIL", "ISSUE", "CONTRIBUTOR"], ["WORK.THUMB_ID", "WORK.ISS_ID", "WORK.CON_ID"], ["THUMBNAIL.THUMB_ID", "ISSUE.ISS_ID", "CONTRIBUTOR.CON_ID"], "WORK.WORK_ID", "DESC");
             break; 
         case "media": 
             $works = $database->selectCustom("WORK", ["WORK.WORK_ID", "WORK.WORK_NAME", "THUMBNAIL.THUMB_LINK", "THUMBNAIL.THUMB_DESCRIPT", "ISSUE.ISS_NAME", "ISSUE.ISS_DATE", "CONTRIBUTOR.CON_FNAME", "CONTRIBUTOR.CON_LNAME"], ["MEDIA_ID"], [$media], ["="], "OR", ["THUMBNAIL", "ISSUE", "CONTRIBUTOR"], ["WORK.THUMB_ID", "WORK.ISS_ID", "WORK.CON_ID"], ["THUMBNAIL.THUMB_ID", "ISSUE.ISS_ID", "CONTRIBUTOR.CON_ID"], "YEAR(ISSUE.ISS_DATE)", "DESC");
@@ -65,25 +65,28 @@
 
             echo "</div>"; 
 
-            echo "<div class='next-page'>";
-            echo "<form action='archives.php' method='POST'>";  
+            // Not doing previous/next page with search results atm
+            if (!$query) {
+                echo "<div class='next-page'>";
+                echo "<form action='archives.php' method='POST'>";  
 
-            if ($firstShownId == $_SESSION["lastWorkId"]) {
-                echo "<button type='button' style='color:grey; text-decoration:none;'>Previous Page</button>";
-            } else {
-                echo "<button type='submit' name='firstShownId' value=$firstShownId>Previous Page</button>";
+                if ($firstShownId == $_SESSION["lastWorkId"]) {
+                    echo "<button type='button' style='color:grey; text-decoration:none;'>Previous Page</button>";
+                } else {
+                    echo "<button type='submit' name='firstShownId' value=$firstShownId>Previous Page</button>";
+                }
+
+                echo "<p> | </p>"; 
+
+                if ($lastShownId == $_SESSION["firstWorkId"]) {
+                    echo "<button type='button' style='color:grey; text-decoration:none;'>Next Page</button>"; 
+                } else {
+                    echo "<button type='submit' name='lastShownId' value=$lastShownId>Next Page</button>"; 
+                }
+
+                echo "</form>"; 
+                echo "</div>"; 
             }
-
-            echo "<p> | </p>"; 
-
-            if ($lastShownId == $_SESSION["firstWorkId"]) {
-                echo "<button type='button' style='color:grey; text-decoration:none;'>Next Page</button>"; 
-            } else {
-                echo "<button type='submit' name='lastShownId' value=$lastShownId>Next Page</button>"; 
-            }
-
-            echo "</form>"; 
-            echo "</div>"; 
         } else if (!$works && $query) {
             echo "<div class='empty-message large'>"; 
             echo "<p>No results for '$query.'</p>"; 
