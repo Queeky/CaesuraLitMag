@@ -24,6 +24,20 @@ class Database {
         return $cleanData; 
     }
 
+    // This will use a safe mysql_fetch function (finish later)
+    function readQuery($sql, $return = false) {
+        if ($return) {
+            $result = mysqli_query($this->conn, $sql);
+            $array = mysqli_fetch_all($result, MYSQLI_ASSOC);
+
+            mysqli_free_result($result);
+
+            return $array;
+        } else {
+            return mysqli_query($this->conn, $sql) ? true : false;
+        }
+    }
+
     // Add where condition later
     function insertValues($table, $selected = [], $values = []) {
         // Sanitizing input
@@ -96,12 +110,9 @@ class Database {
         return mysqli_query($this->conn, $sql) ? true : false; 
     }
 
-    // Clears SEARCH table
-
-    // What if multiple people are using the search simultaneously? 
-    // The search table needs to be special to each user
+    // Clears SEARCH table for specific session
     function cleanPriority() {
-        $sql = "DELETE FROM SEARCH WHERE WORK_ID <> 0;"; 
+        $sql = "DELETE FROM SEARCH WHERE SESSION_ID = '$_SESSION[sessionId]';"; 
 
         return mysqli_query($this->conn, $sql) ? true : false;
     }
@@ -253,8 +264,8 @@ class Database {
     }
 
     function selectSearch($queryArray) {
-        // Generating a random $_SESSION id # to help identify searches
-        if (!isset($_SESSION["sessionId"])) $_SESSION["sessionId"] = uniqid(); 
+        // Removing everything from SEARCH table
+        $this->cleanPriority();  
 
         // Calling searchWorks procedure
         foreach ($queryArray as $keyword) {
@@ -263,14 +274,13 @@ class Database {
             mysqli_query($this->conn, $sql);
         }
         
-        $sql = "SELECT WORK.WORK_ID, WORK.WORK_NAME, THUMBNAIL.THUMB_LINK, THUMBNAIL.THUMB_DESCRIPT, SEARCH.WORK_PRIORITY, "; 
+        $sql = "SELECT WORK.WORK_ID, WORK.WORK_NAME, THUMBNAIL.THUMB_LINK, THUMBNAIL.THUMB_DESCRIPT, SEARCH.WORK_PRIORITY, SEARCH.ORDER_ID, "; 
         $sql .= "ISSUE.ISS_NAME, ISSUE.ISS_DATE, CONTRIBUTOR.CON_FNAME, CONTRIBUTOR.CON_LNAME "; 
         $sql .= "FROM SEARCH "; 
         $sql .= "JOIN WORK ON SEARCH.WORK_ID = WORK.WORK_ID ";
         $sql .= "JOIN THUMBNAIL ON WORK.THUMB_ID = THUMBNAIL.THUMB_ID "; 
         $sql .= "JOIN ISSUE ON WORK.ISS_ID = ISSUE.ISS_ID "; 
         $sql .= "JOIN CONTRIBUTOR ON WORK.CON_ID = CONTRIBUTOR.CON_ID "; 
-        $sql .= "JOIN MEDIA_TYPE ON WORK.MEDIA_ID = MEDIA_TYPE.MEDIA_ID ";
         $sql .= "WHERE SEARCH.SESSION_ID = '$_SESSION[sessionId]' "; 
         $sql .= "ORDER BY SEARCH.WORK_PRIORITY DESC, SEARCH.WORK_ID DESC;"; 
 
@@ -282,9 +292,6 @@ class Database {
         // var_dump($array); 
 
         mysqli_free_result($result);
-
-        // // Removing everything from SEARCH table
-        $this->cleanPriority(); 
 
         return $array;
     }

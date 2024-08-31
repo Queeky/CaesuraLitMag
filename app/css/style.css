@@ -136,11 +136,33 @@ body {
     border-top: 1px solid black; 
 }
 
-.next-page > form {
-    display: flex; 
+.next-page > p {
+    font-family:'Times New Roman', Times, serif; 
+    font-size: 1.3vw;
 }
 
-.next-page > form > button {
+.next-page > .line-break {
+    margin-left: 1vw; 
+    margin-right: 1vw; 
+}
+
+.next-page > a {
+    display: inline-block; 
+    text-decoration: none; 
+    color: black; 
+    font-family:'Times New Roman', Times, serif; 
+    font-size: 1.3vw;
+}
+
+.next-page > a:hover {
+    text-decoration: underline; 
+}
+
+/* .next-page > form {
+    display: flex; 
+} */
+
+/* .next-page > form > button {
     display: inline-block; 
     margin-left: 1vw; 
     margin-right: 1vw; 
@@ -156,7 +178,7 @@ body {
 .next-page > form > button:hover {
     text-decoration: underline; 
     background-color: none; 
-}
+} */
 
 /* Header  */
 
@@ -1539,14 +1561,22 @@ textarea.edit {
         padding-bottom: 5vw; 
     }
 
-    .next-page > form > button {
+    /* .next-page > form > button {
         margin-left: 3vw; 
         margin-right: 3vw; 
         font-size: 6vw; 
+    } */
+
+    .next-page > p {
+        font-size: 6vw; 
     }
 
-    .next-page > form > p {
+    .next-page > a {
+        margin-left: 3vw; 
+        margin-right: 3vw; 
         font-size: 6vw; 
+        text-decoration: none; 
+        color: black; 
     }
 
 

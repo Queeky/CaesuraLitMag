@@ -2,46 +2,282 @@
     $queryArray = explode(" ", $query); // Breaking up keywords w/ " " delimiter
     $database = new Database(); // Fix this later
 
-    // echo var_dump($GLOBALS); 
-
     // Use switch statement to choose between searchKeys
     switch($searchKey) {
         case "query": 
-            $works = $database->selectSearch($queryArray); 
+            $_GET["urlKeypair"] = "query=$_GET[query]&"; 
+
+            // Uploading query results to SEARCH to be accessed page by page
+            if ((!isset($_GET["fs"])) && (!isset($_GET["ls"]))) {
+                $database->cleanPriority(); 
+
+                $sql = "SET @order := 0"; 
+                mysqli_query($database->conn, $sql);
+
+                // Calling searchWorks procedure
+                foreach ($queryArray as $keyword) {
+                    $sql = "CALL searchWorks('$keyword', '$_SESSION[sessionId]');"; 
+
+                    mysqli_query($database->conn, $sql);
+                }
+
+                $sql = "SELECT W1.ORDER_ID AS FIRST_SEARCH, W2.ORDER_ID AS LAST_SEARCH FROM"; 
+                $sql .= "(SELECT ORDER_ID FROM SEARCH WHERE SESSION_ID = '$_SESSION[sessionId]' "; 
+                $sql .= "ORDER BY ORDER_ID ASC LIMIT 1) AS W1, ";
+                $sql .= "(SELECT ORDER_ID FROM SEARCH WHERE SESSION_ID = '$_SESSION[sessionId]' "; 
+                $sql .= "ORDER BY ORDER_ID DESC LIMIT 1) AS W2"; 
+
+                $result = mysqli_query($database->conn, $sql);
+                $idRange = mysqli_fetch_all($result, MYSQLI_ASSOC);
+
+                $_SESSION["firstSearchId"] = $idRange[0]["FIRST_SEARCH"]; 
+                $_SESSION["lastSearchId"] = $idRange[0]["LAST_SEARCH"]; 
+
+                mysqli_free_result($result);
+
+                // Setting $_GET["ls"]
+                $_GET["ls"] = $_SESSION["lastSearchId"] + 1;
+            }
+        
+            if (isset($_GET["ls"])) {
+                $sql = "SELECT SEARCH.ORDER_ID, WORK.WORK_ID, WORK.WORK_NAME, THUMBNAIL.THUMB_LINK, "; 
+                $sql .= "THUMBNAIL.THUMB_DESCRIPT, ISSUE.ISS_NAME, ISSUE.ISS_DATE, "; 
+                $sql .= "CONTRIBUTOR.CON_FNAME, CONTRIBUTOR.CON_LNAME ";  
+                $sql .= "FROM SEARCH "; 
+                $sql .= "JOIN WORK ON SEARCH.WORK_ID = WORK.WORK_ID "; 
+                $sql .= "JOIN THUMBNAIL ON WORK.THUMB_ID = THUMBNAIL.THUMB_ID "; 
+                $sql .= "JOIN ISSUE ON WORK.ISS_ID = ISSUE.ISS_ID "; 
+                $sql .= "JOIN CONTRIBUTOR ON WORK.CON_ID = CONTRIBUTOR.CON_ID "; 
+                $sql .= "WHERE SEARCH.SESSION_ID = '$_SESSION[sessionId]' ";
+                $sql .= "AND SEARCH.ORDER_ID < $_GET[ls] "; 
+                $sql .= "ORDER BY SEARCH.WORK_PRIORITY DESC, SEARCH.WORK_ID DESC "; 
+                $sql .= "LIMIT 16";
+            } else if (isset($_GET["fs"])) {
+                $sql = "SELECT * FROM "; 
+                $sql .= "(SELECT SEARCH.ORDER_ID, WORK.WORK_ID, WORK.WORK_NAME, THUMBNAIL.THUMB_LINK, "; 
+                $sql .= "THUMBNAIL.THUMB_DESCRIPT, ISSUE.ISS_NAME, ISSUE.ISS_DATE, "; 
+                $sql .= "CONTRIBUTOR.CON_FNAME, CONTRIBUTOR.CON_LNAME ";  
+                $sql .= "FROM SEARCH "; 
+                $sql .= "JOIN WORK ON SEARCH.WORK_ID = WORK.WORK_ID "; 
+                $sql .= "JOIN THUMBNAIL ON WORK.THUMB_ID = THUMBNAIL.THUMB_ID "; 
+                $sql .= "JOIN ISSUE ON WORK.ISS_ID = ISSUE.ISS_ID "; 
+                $sql .= "JOIN CONTRIBUTOR ON WORK.CON_ID = CONTRIBUTOR.CON_ID "; 
+                $sql .= "WHERE SEARCH.SESSION_ID = '$_SESSION[sessionId]' ";
+                $sql .= "AND SEARCH.ORDER_ID > $_GET[fs] "; 
+                $sql .= "ORDER BY WORK.WORK_ID ASC "; 
+                $sql .= "LIMIT 16) SEARCH ";
+                $sql .= "ORDER BY WORK_PRIORITY DESC, WORK_ID DESC"; 
+            } 
+
+            $result = mysqli_query($database->conn, $sql);
+            $works = mysqli_fetch_all($result, MYSQLI_ASSOC);
+
+            mysqli_free_result($result);
             break; 
-        case "issue": 
-            $works = $database->selectCustom("WORK", ["WORK.WORK_ID", "WORK.WORK_NAME", "THUMBNAIL.THUMB_LINK", "THUMBNAIL.THUMB_DESCRIPT", "ISSUE.ISS_NAME", "ISSUE.ISS_DATE", "CONTRIBUTOR.CON_FNAME", "CONTRIBUTOR.CON_LNAME"], ["ISSUE.ISS_ID"], [$issue], ["="], "OR", ["THUMBNAIL", "ISSUE", "CONTRIBUTOR"], ["WORK.THUMB_ID", "WORK.ISS_ID", "WORK.CON_ID"], ["THUMBNAIL.THUMB_ID", "ISSUE.ISS_ID", "CONTRIBUTOR.CON_ID"], "WORK.WORK_ID", "DESC");
+        case "issue":  
+            $_GET["urlKeypair"] = "issue=$_GET[issue]&"; 
+ 
+            // Uploading issue results to SEARCH to be accessed page by page
+            if ((!isset($_GET["fs"])) && (!isset($_GET["ls"]))) {
+                $database->cleanPriority();
+
+                $sql = "SET @order := 0"; 
+                mysqli_query($database->conn, $sql);
+
+                $sql = "INSERT INTO SEARCH (WORK_ID, WORK_PRIORITY, SESSION_ID, ORDER_ID) "; 
+                $sql .= "SELECT WORK.WORK_ID, 4, '$_SESSION[sessionId]', (@order := @order + 1) FROM WORK "; 
+                $sql .= "JOIN ISSUE ON WORK.ISS_ID = ISSUE.ISS_ID "; 
+                $sql .= "WHERE ISSUE.ISS_ID = $_GET[issue]"; 
+
+                mysqli_query($database->conn, $sql);
+
+                $sql = "SELECT W1.ORDER_ID AS FIRST_SEARCH, W2.ORDER_ID AS LAST_SEARCH FROM"; 
+                $sql .= "(SELECT ORDER_ID FROM SEARCH WHERE SESSION_ID = '$_SESSION[sessionId]' "; 
+                $sql .= "ORDER BY ORDER_ID ASC LIMIT 1) AS W1, ";
+                $sql .= "(SELECT ORDER_ID FROM SEARCH WHERE SESSION_ID = '$_SESSION[sessionId]' "; 
+                $sql .= "ORDER BY ORDER_ID DESC LIMIT 1) AS W2"; 
+
+                $result = mysqli_query($database->conn, $sql);
+                $idRange = mysqli_fetch_all($result, MYSQLI_ASSOC);
+
+                $_SESSION["firstSearchId"] = $idRange[0]["FIRST_SEARCH"]; 
+                $_SESSION["lastSearchId"] = $idRange[0]["LAST_SEARCH"]; 
+
+                mysqli_free_result($result);
+
+                // Setting $_GET["ls"]
+                $_GET["ls"] = $_SESSION["lastSearchId"] + 1; 
+            }
+
+            if (isset($_GET["ls"])) {
+                $sql = "SELECT SEARCH.ORDER_ID, WORK.WORK_ID, WORK.WORK_NAME, THUMBNAIL.THUMB_LINK, "; 
+                $sql .= "THUMBNAIL.THUMB_DESCRIPT, ISSUE.ISS_NAME, ISSUE.ISS_DATE, "; 
+                $sql .= "CONTRIBUTOR.CON_FNAME, CONTRIBUTOR.CON_LNAME ";  
+                $sql .= "FROM SEARCH "; 
+                $sql .= "JOIN WORK ON SEARCH.WORK_ID = WORK.WORK_ID "; 
+                $sql .= "JOIN THUMBNAIL ON WORK.THUMB_ID = THUMBNAIL.THUMB_ID "; 
+                $sql .= "JOIN ISSUE ON WORK.ISS_ID = ISSUE.ISS_ID "; 
+                $sql .= "JOIN CONTRIBUTOR ON WORK.CON_ID = CONTRIBUTOR.CON_ID "; 
+                $sql .= "WHERE SEARCH.SESSION_ID = '$_SESSION[sessionId]' ";
+                $sql .= "AND SEARCH.ORDER_ID < $_GET[ls] "; 
+                $sql .= "ORDER BY WORK.WORK_ID DESC "; 
+                $sql .= "LIMIT 16";
+            } else if (isset($_GET["fs"])) {
+                $sql = "SELECT * FROM "; 
+                $sql .= "(SELECT SEARCH.ORDER_ID, WORK.WORK_ID, WORK.WORK_NAME, THUMBNAIL.THUMB_LINK, "; 
+                $sql .= "THUMBNAIL.THUMB_DESCRIPT, ISSUE.ISS_NAME, ISSUE.ISS_DATE, "; 
+                $sql .= "CONTRIBUTOR.CON_FNAME, CONTRIBUTOR.CON_LNAME ";  
+                $sql .= "FROM SEARCH "; 
+                $sql .= "JOIN WORK ON SEARCH.WORK_ID = WORK.WORK_ID "; 
+                $sql .= "JOIN THUMBNAIL ON WORK.THUMB_ID = THUMBNAIL.THUMB_ID "; 
+                $sql .= "JOIN ISSUE ON WORK.ISS_ID = ISSUE.ISS_ID "; 
+                $sql .= "JOIN CONTRIBUTOR ON WORK.CON_ID = CONTRIBUTOR.CON_ID "; 
+                $sql .= "WHERE SEARCH.SESSION_ID = '$_SESSION[sessionId]' ";
+                $sql .= "AND SEARCH.ORDER_ID > $_GET[fs] "; 
+                $sql .= "ORDER BY WORK.WORK_ID ASC "; 
+                $sql .= "LIMIT 16) SEARCH ";
+                $sql .= "ORDER BY WORK_ID DESC"; 
+            } 
+
+            $result = mysqli_query($database->conn, $sql);
+            $works = mysqli_fetch_all($result, MYSQLI_ASSOC);
+
+            mysqli_free_result($result);
             break; 
         case "media": 
-            $works = $database->selectCustom("WORK", ["WORK.WORK_ID", "WORK.WORK_NAME", "THUMBNAIL.THUMB_LINK", "THUMBNAIL.THUMB_DESCRIPT", "ISSUE.ISS_NAME", "ISSUE.ISS_DATE", "CONTRIBUTOR.CON_FNAME", "CONTRIBUTOR.CON_LNAME"], ["MEDIA_ID"], [$media], ["="], "OR", ["THUMBNAIL", "ISSUE", "CONTRIBUTOR"], ["WORK.THUMB_ID", "WORK.ISS_ID", "WORK.CON_ID"], ["THUMBNAIL.THUMB_ID", "ISSUE.ISS_ID", "CONTRIBUTOR.CON_ID"], "YEAR(ISSUE.ISS_DATE)", "DESC");
+            $_GET["urlKeypair"] = "media=$_GET[media]&";
+
+            // Uploading media results to SEARCH to be accessed page by page
+            if ((!isset($_GET["fs"])) && (!isset($_GET["ls"]))) {
+                $database->cleanPriority();
+
+                $sql = "SET @order := 0"; 
+                mysqli_query($database->conn, $sql);
+
+                $sql = "INSERT INTO SEARCH (WORK_ID, WORK_PRIORITY, SESSION_ID, ORDER_ID) "; 
+                $sql .= "SELECT WORK.WORK_ID, 3, '$_SESSION[sessionId]', (@order := @order + 1) FROM WORK "; 
+                $sql .= "JOIN MEDIA_TYPE ON WORK.MEDIA_ID = MEDIA_TYPE.MEDIA_ID "; 
+                $sql .= "WHERE MEDIA_TYPE.MEDIA_ID = $_GET[media]"; 
+
+                mysqli_query($database->conn, $sql);
+
+                $sql = "SELECT W1.ORDER_ID AS FIRST_SEARCH, W2.ORDER_ID AS LAST_SEARCH FROM"; 
+                $sql .= "(SELECT ORDER_ID FROM SEARCH WHERE SESSION_ID = '$_SESSION[sessionId]' "; 
+                $sql .= "ORDER BY ORDER_ID ASC LIMIT 1) AS W1, ";
+                $sql .= "(SELECT ORDER_ID FROM SEARCH WHERE SESSION_ID = '$_SESSION[sessionId]' "; 
+                $sql .= "ORDER BY ORDER_ID DESC LIMIT 1) AS W2"; 
+
+                $result = mysqli_query($database->conn, $sql);
+                $idRange = mysqli_fetch_all($result, MYSQLI_ASSOC);
+
+                $_SESSION["firstSearchId"] = $idRange[0]["FIRST_SEARCH"]; 
+                $_SESSION["lastSearchId"] = $idRange[0]["LAST_SEARCH"]; 
+
+                mysqli_free_result($result);
+
+                // Setting $_GET["ls"]
+                $_GET["ls"] = $_SESSION["lastSearchId"] + 1; 
+            }
+
+            if (isset($_GET["ls"])) {
+                $sql = "SELECT SEARCH.ORDER_ID, WORK.WORK_ID, WORK.WORK_NAME, THUMBNAIL.THUMB_LINK, "; 
+                $sql .= "THUMBNAIL.THUMB_DESCRIPT, ISSUE.ISS_NAME, ISSUE.ISS_DATE, "; 
+                $sql .= "CONTRIBUTOR.CON_FNAME, CONTRIBUTOR.CON_LNAME ";  
+                $sql .= "FROM SEARCH "; 
+                $sql .= "JOIN WORK ON SEARCH.WORK_ID = WORK.WORK_ID "; 
+                $sql .= "JOIN THUMBNAIL ON WORK.THUMB_ID = THUMBNAIL.THUMB_ID "; 
+                $sql .= "JOIN ISSUE ON WORK.ISS_ID = ISSUE.ISS_ID "; 
+                $sql .= "JOIN CONTRIBUTOR ON WORK.CON_ID = CONTRIBUTOR.CON_ID "; 
+                $sql .= "WHERE SEARCH.SESSION_ID = '$_SESSION[sessionId]' ";
+                $sql .= "AND SEARCH.ORDER_ID < $_GET[ls] "; 
+                $sql .= "ORDER BY WORK.WORK_ID DESC "; 
+                $sql .= "LIMIT 16";
+            } else if (isset($_GET["fs"])) {
+                $sql = "SELECT * FROM "; 
+                $sql .= "(SELECT SEARCH.ORDER_ID, WORK.WORK_ID, WORK.WORK_NAME, THUMBNAIL.THUMB_LINK, "; 
+                $sql .= "THUMBNAIL.THUMB_DESCRIPT, ISSUE.ISS_NAME, ISSUE.ISS_DATE, "; 
+                $sql .= "CONTRIBUTOR.CON_FNAME, CONTRIBUTOR.CON_LNAME ";  
+                $sql .= "FROM SEARCH "; 
+                $sql .= "JOIN WORK ON SEARCH.WORK_ID = WORK.WORK_ID "; 
+                $sql .= "JOIN THUMBNAIL ON WORK.THUMB_ID = THUMBNAIL.THUMB_ID "; 
+                $sql .= "JOIN ISSUE ON WORK.ISS_ID = ISSUE.ISS_ID "; 
+                $sql .= "JOIN CONTRIBUTOR ON WORK.CON_ID = CONTRIBUTOR.CON_ID "; 
+                $sql .= "WHERE SEARCH.SESSION_ID = '$_SESSION[sessionId]' ";
+                $sql .= "AND SEARCH.ORDER_ID > $_GET[fs] "; 
+                $sql .= "ORDER BY WORK.WORK_ID ASC "; 
+                $sql .= "LIMIT 16) SEARCH ";
+                $sql .= "ORDER BY WORK_ID DESC"; 
+            } 
+
+            $result = mysqli_query($database->conn, $sql);
+            $works = mysqli_fetch_all($result, MYSQLI_ASSOC);
+
+            mysqli_free_result($result);
             break;
         default: 
-            if (isset($_POST['firstShownId'])) {
-                $table = "(SELECT WORK.WORK_ID, WORK.WORK_NAME, THUMBNAIL.THUMB_LINK, THUMBNAIL.THUMB_DESCRIPT, ISSUE.ISS_NAME, ISSUE.ISS_DATE, CONTRIBUTOR.CON_FNAME, CONTRIBUTOR.CON_LNAME FROM WORK JOIN THUMBNAIL ON WORK.THUMB_ID = THUMBNAIL.THUMB_ID JOIN ISSUE ON WORK.ISS_ID = ISSUE.ISS_ID JOIN CONTRIBUTOR ON WORK.CON_ID = CONTRIBUTOR.CON_ID "; 
-                $table .= "WHERE WORK.WORK_ID > $_POST[firstShownId] "; 
-                $table .= "ORDER BY WORK.WORK_ID ASC LIMIT 16) WORK"; 
+            $_GET["urlKeypair"] = ""; 
 
-                $works = $database->selectCustom($table, ["*"], order: "WORK_ID", orderType: "DESC");
-            } else {
-                $works = $database->selectCustom("WORK", ["WORK.WORK_ID", "WORK.WORK_NAME", "THUMBNAIL.THUMB_LINK", "THUMBNAIL.THUMB_DESCRIPT", "ISSUE.ISS_NAME", "ISSUE.ISS_DATE", "CONTRIBUTOR.CON_FNAME", "CONTRIBUTOR.CON_LNAME"], wColumn: ["WORK_ID"], wValue: [$_POST['lastShownId']], wOperator: ["<"],  jTable: ["THUMBNAIL", "ISSUE", "CONTRIBUTOR"], jColumn1: ["WORK.THUMB_ID", "WORK.ISS_ID", "WORK.CON_ID"], jColumn2: ["THUMBNAIL.THUMB_ID", "ISSUE.ISS_ID", "CONTRIBUTOR.CON_ID"], order: "WORK.WORK_ID", orderType: "DESC", limit: 16);
+            if ((!isset($_GET["fs"])) && (!isset($_GET["ls"]))) {
+                $_SESSION["firstSearchId"] = $_SESSION["firstWorkId"]; 
+                $_SESSION["lastSearchId"] = $_SESSION["lastWorkId"]; 
+
+                $_GET["ls"] = $_SESSION["lastWorkId"] + 1; 
             }
+
+            if (isset($_GET["ls"])) {
+                $sql = "SELECT WORK.WORK_ID, WORK.WORK_NAME, THUMBNAIL.THUMB_LINK, "; 
+                $sql .= "THUMBNAIL.THUMB_DESCRIPT, ISSUE.ISS_NAME, ISSUE.ISS_DATE, "; 
+                $sql .= "CONTRIBUTOR.CON_FNAME, CONTRIBUTOR.CON_LNAME ";  
+                $sql .= "FROM WORK "; 
+                $sql .= "JOIN THUMBNAIL ON WORK.THUMB_ID = THUMBNAIL.THUMB_ID "; 
+                $sql .= "JOIN ISSUE ON WORK.ISS_ID = ISSUE.ISS_ID "; 
+                $sql .= "JOIN CONTRIBUTOR ON WORK.CON_ID = CONTRIBUTOR.CON_ID "; 
+                $sql .= "WHERE WORK.WORK_ID < $_GET[ls] "; 
+                $sql .= "ORDER BY WORK.WORK_ID DESC "; 
+                $sql .= "LIMIT 16";
+            } else if (isset($_GET["fs"])) {
+                $sql = "SELECT * FROM "; 
+                $sql .= "(SELECT WORK.WORK_ID, WORK.WORK_NAME, THUMBNAIL.THUMB_LINK, "; 
+                $sql .= "THUMBNAIL.THUMB_DESCRIPT, ISSUE.ISS_NAME, ISSUE.ISS_DATE, "; 
+                $sql .= "CONTRIBUTOR.CON_FNAME, CONTRIBUTOR.CON_LNAME ";  
+                $sql .= "FROM WORK "; 
+                $sql .= "JOIN THUMBNAIL ON WORK.THUMB_ID = THUMBNAIL.THUMB_ID "; 
+                $sql .= "JOIN ISSUE ON WORK.ISS_ID = ISSUE.ISS_ID "; 
+                $sql .= "JOIN CONTRIBUTOR ON WORK.CON_ID = CONTRIBUTOR.CON_ID "; 
+                $sql .= "WHERE WORK.WORK_ID > $_GET[fs] "; 
+                $sql .= "ORDER BY WORK.WORK_ID ASC "; 
+                $sql .= "LIMIT 16) WORK ";
+                $sql .= "ORDER BY WORK_ID DESC"; 
+            } 
+
+            var_dump($sql); 
+
+            $result = mysqli_query($database->conn, $sql);
+            $works = mysqli_fetch_all($result, MYSQLI_ASSOC);
+
+            mysqli_free_result($result);
             break;  
     }
 
     function displayWorks($works, $query) {
         if ($works) {
-            // echo var_dump($works); 
+            // echo "<br><br><br>" . var_dump($works); 
 
             // Checking if a search is in action; otherwise, WORK_PRIORITY does 
             // not exist in results
             $query ? $priority = intval($works[0]["WORK_PRIORITY"]) : $priority = null; 
-            $firstShownId = $works[0]["WORK_ID"]; 
-            $lastShownId = $works[count($works) - 1]["WORK_ID"]; 
+
+            // If default, WORK_ID; otherwise ORDER_ID
+            (isset($_GET["issue"]) || isset($_GET["media"]) || isset($_GET["query"])) ? $firstShownId = $works[0]["ORDER_ID"] : $firstShownId = $works[0]["WORK_ID"]; 
+            (isset($_GET["issue"]) || isset($_GET["media"]) || isset($_GET["query"])) ? $lastShownId = $works[count($works) - 1]["ORDER_ID"] : $lastShownId = $works[count($works) - 1]["WORK_ID"]; 
+
+            echo "<br>" . "FIRST LOADED ID: " . $firstShownId . "<br>"; 
+            echo "<br>" . "LAST LOADED ID: " . $lastShownId . "<br>";
 
             echo "<div class='grid'>"; 
 
             foreach ($works as $work) {
-                if ($priority && ($priority > 2 && intval($work["WORK_PRIORITY"]) < 2)) {
+                if ($priority && ($priority > 1 && intval($work["WORK_PRIORITY"]) <= 1)) {
                     echo "</div>"; 
 
                     echo "<div class='similar-results'>"; 
@@ -65,28 +301,23 @@
 
             echo "</div>"; 
 
-            // Not doing previous/next page with search results atm
-            if (!$query) {
-                echo "<div class='next-page'>";
-                echo "<form action='archives.php' method='POST'>";  
+            echo "<div class='next-page'>";
 
-                if ($firstShownId == $_SESSION["lastWorkId"]) {
-                    echo "<button type='button' style='color:grey; text-decoration:none;'>Previous Page</button>";
-                } else {
-                    echo "<button type='submit' name='firstShownId' value=$firstShownId>Previous Page</button>";
-                }
-
-                echo "<p> | </p>"; 
-
-                if ($lastShownId == $_SESSION["firstWorkId"]) {
-                    echo "<button type='button' style='color:grey; text-decoration:none;'>Next Page</button>"; 
-                } else {
-                    echo "<button type='submit' name='lastShownId' value=$lastShownId>Next Page</button>"; 
-                }
-
-                echo "</form>"; 
-                echo "</div>"; 
+            if ($firstShownId == $_SESSION["lastSearchId"]) {
+                echo "<p style='color:grey; text-decoration:none;'>Previous Page</p>"; 
+            } else {
+                echo "<a href='archives.php?$_GET[urlKeypair]fs=$firstShownId'>Previous Page</a>"; 
             }
+
+            echo "<p class='line-break'> | </p>"; 
+
+            if ($lastShownId == $_SESSION["firstSearchId"]) {
+                echo "<p style='color:grey; text-decoration:none;'>Next Page</p>"; 
+            } else {
+                echo "<a href='archives.php?$_GET[urlKeypair]ls=$lastShownId'>Next Page</a>"; 
+            }
+
+            echo "</div>"; 
         } else if (!$works && $query) {
             echo "<div class='empty-message large'>"; 
             echo "<p>No results for '$query.'</p>"; 
