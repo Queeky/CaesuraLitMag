@@ -8,20 +8,25 @@
     $media = null; 
     $searchKey = null; 
 
+    if (!isset($_GET["urlKeypair"])) $_GET["urlKeypair"] = ""; 
+
     // Checking existence of all search variables
     if (isset($_GET['query'])) {
         $query = $_GET['query']; 
         $searchKey = "query"; 
+        $_GET["urlKeypair"] = "query=$_GET[query]&";
     } 
 
     if (isset($_GET['issue'])) {
         $issue = $_GET['issue']; 
         $searchKey = "issue"; 
+        $_GET["urlKeypair"] = "issue=$_GET[issue]&"; 
     }
 
     if (isset($_GET['media'])) {
         $media = $_GET['media'];
         $searchKey = "media"; 
+        $_GET["urlKeypair"] = "media=$_GET[media]&";
     }
 
     if (!isset($_POST['lastShownId'])) {

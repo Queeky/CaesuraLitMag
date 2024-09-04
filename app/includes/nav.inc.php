@@ -6,8 +6,6 @@ $database = new Database(); // Fix this later
 // Generating a random $_SESSION id # to help identify searches
 if (!isset($_SESSION["sessionId"])) $_SESSION["sessionId"] = uniqid();
 
-// Eventually put this in a SESSION var too so it doesn't call all the time? 
-// Maybe?
 $results = $database->selectCustom("MEDIA_TYPE", ["*"]); 
 
 if ((!isset($_SESSION["firstWorkId"])) && (!isset($_SESSION["lastWorkId"]))) {
@@ -26,9 +24,6 @@ if ((!isset($_SESSION["firstSearchId"])) && (!isset($_SESSION["lastSearchId"])))
     $_SESSION["firstSearchId"] = $_SESSION["firstWorkId"]; 
     $_SESSION["lastSearchId"] = $_SESSION["lastWorkId"]; 
 }
-
-echo "FIRST WORK! " . $_SESSION["firstWorkId"]; 
-echo "<br>SESSION ID " . $_SESSION["sessionId"]; 
 
 echo "<script>"; 
 echo include("javascript/action.js"); 
